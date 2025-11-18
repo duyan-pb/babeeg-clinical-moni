@@ -153,7 +153,7 @@ export function ImportTab() {
           <CardDescription>Import Temple, CHB-MIT datasets or individual EDF files with validation and integrity checks</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-[200px_1fr_auto]">
+          <div className="grid gap-3 md:grid-cols-[200px_1fr_auto]">
             <div className="space-y-1">
               <Label>Dataset</Label>
               <Select defaultValue="4940267">
@@ -199,8 +199,8 @@ export function ImportTab() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="new">New Patient</SelectItem>
-                  <SelectItem value="neo-12">Neo-12 (38w GA)</SelectItem>
-                  <SelectItem value="neo-08">Neo-08 (34w GA)</SelectItem>
+                  <SelectItem value="tre-12">Trẻ-12 (38w GA)</SelectItem>
+                  <SelectItem value="tre-08">Trẻ-08 (34w GA)</SelectItem>
                 </SelectContent>
               </Select>
             </div>

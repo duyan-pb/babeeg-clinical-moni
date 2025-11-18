@@ -52,7 +52,7 @@ export function GlobalHeader() {
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
           <div className="flex items-center gap-2">
             <span className="text-muted-foreground">Patient:</span>
-            <span className="font-medium">Neo-##</span>
+            <span className="font-medium">Trẻ-##</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-muted-foreground">MRN:</span>
@@ -89,7 +89,7 @@ export function GlobalHeader() {
             <input 
               type="text" 
               className="h-6 w-28 rounded border border-input bg-background px-2 text-xs"
-              placeholder="Dr."
+              placeholder="BS."
               value={data.clinician}
               onChange={(e) => handleUpdate('clinician', e.target.value)}
             />

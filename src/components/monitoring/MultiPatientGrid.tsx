@@ -19,12 +19,12 @@ interface PatientBed {
 }
 
 const SAMPLE_BEDS: PatientBed[] = [
-  { id: 'bed-1', bedNumber: 'NICU-01', patientId: 'Neo-101', streamHealth: 'good', battery: 95, connectivity: 'wifi', seizureProbability: 0.12, acuity: 'low', lastUpdate: '2s ago' },
-  { id: 'bed-2', bedNumber: 'NICU-02', patientId: 'Neo-102', streamHealth: 'good', battery: 78, connectivity: 'ethernet', seizureProbability: 0.68, acuity: 'high', lastUpdate: '1s ago' },
-  { id: 'bed-3', bedNumber: 'NICU-03', patientId: 'Neo-103', streamHealth: 'degraded', battery: 45, connectivity: 'wifi', seizureProbability: 0.34, acuity: 'medium', lastUpdate: '5s ago' },
-  { id: 'bed-4', bedNumber: 'NICU-04', patientId: 'Neo-104', streamHealth: 'good', battery: 100, connectivity: 'ethernet', seizureProbability: 0.08, acuity: 'low', lastUpdate: '1s ago' },
-  { id: 'bed-5', bedNumber: 'NICU-05', patientId: 'Neo-105', streamHealth: 'disconnected', battery: 12, connectivity: 'disconnected', seizureProbability: 0.0, acuity: 'high', lastUpdate: '45s ago' },
-  { id: 'bed-6', bedNumber: 'NICU-06', patientId: 'Neo-106', streamHealth: 'good', battery: 88, connectivity: 'wifi', seizureProbability: 0.21, acuity: 'low', lastUpdate: '2s ago' },
+  { id: 'bed-1', bedNumber: 'NICU-01', patientId: 'Trẻ-101', streamHealth: 'good', battery: 95, connectivity: 'wifi', seizureProbability: 0.12, acuity: 'low', lastUpdate: '2s ago' },
+  { id: 'bed-2', bedNumber: 'NICU-02', patientId: 'Trẻ-102', streamHealth: 'good', battery: 78, connectivity: 'ethernet', seizureProbability: 0.68, acuity: 'high', lastUpdate: '1s ago' },
+  { id: 'bed-3', bedNumber: 'NICU-03', patientId: 'Trẻ-103', streamHealth: 'degraded', battery: 45, connectivity: 'wifi', seizureProbability: 0.34, acuity: 'medium', lastUpdate: '5s ago' },
+  { id: 'bed-4', bedNumber: 'NICU-04', patientId: 'Trẻ-104', streamHealth: 'good', battery: 100, connectivity: 'ethernet', seizureProbability: 0.08, acuity: 'low', lastUpdate: '1s ago' },
+  { id: 'bed-5', bedNumber: 'NICU-05', patientId: 'Trẻ-105', streamHealth: 'disconnected', battery: 12, connectivity: 'disconnected', seizureProbability: 0.0, acuity: 'high', lastUpdate: '45s ago' },
+  { id: 'bed-6', bedNumber: 'NICU-06', patientId: 'Trẻ-106', streamHealth: 'good', battery: 88, connectivity: 'wifi', seizureProbability: 0.21, acuity: 'low', lastUpdate: '2s ago' },
 ]
 
 export function MultiPatientGrid() {
@@ -77,7 +77,7 @@ export function MultiPatientGrid() {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {filteredBeds.map((bed) => (
           <Card 
             key={bed.id}

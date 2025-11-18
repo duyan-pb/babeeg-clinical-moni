@@ -190,7 +190,7 @@ export function SetupTab() {
         </Alert>
       )}
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Channels</CardTitle>
@@ -510,7 +510,7 @@ export function SetupTab() {
           <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
             <div className="space-y-1">
               <Label htmlFor="patient-id">Patient ID</Label>
-              <Input id="patient-id" placeholder="Neo-##" />
+              <Input id="patient-id" placeholder="Trẻ-##" />
             </div>
             <div className="space-y-1">
               <Label htmlFor="session-name">Session name</Label>

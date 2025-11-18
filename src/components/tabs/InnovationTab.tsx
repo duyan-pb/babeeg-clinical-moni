@@ -89,7 +89,7 @@ export function InnovationTab() {
           <CardTitle>Feature Flags</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-3 md:grid-cols-2">
             <div className="flex items-center justify-between rounded border border-border p-3">
               <Label htmlFor="multi-patient-flag" className="text-sm">Multi-Patient Grid</Label>
               <Switch 
@@ -147,7 +147,7 @@ export function InnovationTab() {
             <CardTitle>Mobile Monitoring Cards (planned)</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-3 md:grid-cols-2">
               <div className="rounded-lg border border-border p-4">
                 <div className="mb-3 font-semibold">Home Kit A</div>
                 <div className="space-y-2 text-sm">
