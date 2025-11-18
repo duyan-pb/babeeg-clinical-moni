@@ -77,7 +77,7 @@ export function SpikeSeizureQueue() {
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Sparkle className="h-5 w-5" />
@@ -99,8 +99,8 @@ export function SpikeSeizureQueue() {
         </div>
       </CardHeader>
       <CardContent>
-        <ScrollArea className="h-96">
-          <div className="space-y-2">
+        <ScrollArea className="h-80">
+          <div className="space-y-2 pr-3">
             {pendingEvents.length === 0 ? (
               <div className="py-8 text-center text-sm text-muted-foreground">
                 No pending events
@@ -115,8 +115,8 @@ export function SpikeSeizureQueue() {
                       : 'border-border hover:bg-muted/50'
                   }`}
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <input
                           type="checkbox"
@@ -151,7 +151,7 @@ export function SpikeSeizureQueue() {
                         </span>
                       </div>
                     </div>
-                    <div className="flex gap-1">
+                    <div className="flex gap-1 flex-shrink-0">
                       <Button
                         size="sm"
                         variant="ghost"

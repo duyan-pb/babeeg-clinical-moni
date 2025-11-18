@@ -136,36 +136,40 @@ export function ReviewTab() {
         <Button variant="outline" size="sm" onClick={handleResetFilters}>Reset</Button>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_400px]">
+      <div className="grid gap-6 lg:grid-cols-[2fr_320px]">
         <div className="space-y-4">
           <Card>
-            <CardHeader>
+            <CardHeader className="pb-3">
               <CardTitle>Synchronized Timeline + Trends</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="rounded border border-border bg-background p-4">
+              <div className="rounded border border-border bg-background p-6">
                 <TimelineEEG 
                   duration={1800}
                   channels={['Fp1', 'Fp2', 'F3', 'F4', 'C3', 'C4', 'Cz', 'P3']}
                   events={sampleEvents}
                 />
               </div>
-              <div className="h-32 rounded border border-border bg-muted/20 p-4">
-                <div className="text-sm font-medium">Accelerometer + Posture</div>
-                <div className="mt-2 text-xs text-muted-foreground">XYZ axes with motion flags</div>
-              </div>
-              <div className="space-y-2">
-                <div className="text-sm font-medium">Seizure Probability with Threshold</div>
-                <div className="h-24 rounded border border-border bg-muted/20 p-4">
-                  <div className="text-xs text-muted-foreground">Real-time probability curve</div>
-                </div>
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground">Alarm Threshold</span>
-                    <Badge variant="outline" className="text-xs">75%</Badge>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <div className="text-sm font-medium">Accelerometer + Posture</div>
+                  <div className="h-28 rounded border border-border bg-muted/20 p-3">
+                    <div className="text-xs text-muted-foreground">XYZ axes with motion flags</div>
                   </div>
-                  <Slider defaultValue={[75]} max={100} step={1} className="w-full" />
                 </div>
+                <div className="space-y-2">
+                  <div className="text-sm font-medium">Seizure Probability</div>
+                  <div className="h-28 rounded border border-border bg-muted/20 p-3">
+                    <div className="text-xs text-muted-foreground">Real-time probability curve</div>
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">Alarm Threshold</span>
+                  <Badge variant="outline" className="text-xs">75%</Badge>
+                </div>
+                <Slider defaultValue={[75]} max={100} step={1} className="w-full" />
               </div>
             </CardContent>
           </Card>
@@ -173,13 +177,13 @@ export function ReviewTab() {
           <SpikeSeizureQueue />
 
           <Card>
-            <CardHeader>
+            <CardHeader className="pb-3">
               <CardTitle>Annotations</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <Textarea 
                 placeholder="Add clinical notes and observations..." 
-                rows={4}
+                rows={3}
                 value={annotation}
                 onChange={(e) => setAnnotation(e.target.value)}
               />
@@ -193,12 +197,12 @@ export function ReviewTab() {
 
         <div className="space-y-4">
           <Card>
-            <CardHeader>
-              <CardTitle>Spectrogram</CardTitle>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Spectrogram</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <Select>
-                <SelectTrigger>
+                <SelectTrigger className="h-9">
                   <SelectValue placeholder="Select channel" />
                 </SelectTrigger>
                 <SelectContent>
@@ -207,19 +211,19 @@ export function ReviewTab() {
                   <SelectItem value="cz">Cz</SelectItem>
                 </SelectContent>
               </Select>
-              <div className="h-64 rounded border border-border bg-muted/20 p-4">
+              <div className="h-56 rounded border border-border bg-muted/20 p-3">
                 <div className="text-sm font-medium">Frequency (Y) vs Time (X)</div>
-                <div className="text-xs text-muted-foreground">Power spectral density heatmap</div>
+                <div className="mt-1 text-xs text-muted-foreground">Power spectral density heatmap</div>
               </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle>FFT / Band Power</CardTitle>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">FFT / Band Power</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="h-32 rounded border border-border bg-muted/20 p-4">
+              <div className="h-28 rounded border border-border bg-muted/20 p-3">
                 <div className="text-xs text-muted-foreground">Delta, Theta, Alpha, Beta bands</div>
               </div>
               <div className="grid grid-cols-2 gap-2 text-xs">
