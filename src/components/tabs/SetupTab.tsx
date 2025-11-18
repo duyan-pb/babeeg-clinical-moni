@@ -7,6 +7,7 @@ import { ElectrodeGrid } from './ElectrodeGrid'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
+import { MiniWaveform } from '@/components/eeg/MiniWaveform'
 
 export function SetupTab() {
   return (
@@ -171,6 +172,37 @@ export function SetupTab() {
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Signal Quality Preview</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Channel Fp1</span>
+                <Badge variant="outline" className="bg-[oklch(0.60_0.15_145)]">Good</Badge>
+              </div>
+              <MiniWaveform quality="good" />
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Channel F3</span>
+                <Badge variant="outline" className="bg-[oklch(0.70_0.18_75)]">Fair</Badge>
+              </div>
+              <MiniWaveform quality="fair" />
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Channel T4</span>
+                <Badge variant="outline" className="bg-[oklch(0.55_0.22_25)]">Poor</Badge>
+              </div>
+              <MiniWaveform quality="poor" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

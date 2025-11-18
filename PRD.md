@@ -13,18 +13,18 @@ BabEEG is a Class B medical device UI for neonatal EEG monitoring that combines 
 ## Essential Features
 
 ### Real-Time LSL Stream Setup
-- **Functionality**: Connect to Lab Streaming Layer (LSL) devices, validate electrode impedance, configure montages, and initiate monitoring sessions
-- **Purpose**: Ensures proper signal acquisition before clinical monitoring begins, reducing artifact and data loss
+- **Functionality**: Connect to Lab Streaming Layer (LSL) devices, validate electrode impedance with live signal preview, configure montages, and initiate monitoring sessions
+- **Purpose**: Ensures proper signal acquisition before clinical monitoring begins, reducing artifact and data loss through real-time quality visualization
 - **Trigger**: Clinician navigates to Setup tab
-- **Progression**: View LSL status → Select active stream → Check electrode grid impedance (Fp1, Fp2, F3, F4, Cz, etc.) → Review quick stats (channels, sample rate, packet loss, buffer) → Configure session metadata (patient ID, MRN, GA, weight, clinician, shift) → Start monitoring
-- **Success criteria**: All electrodes show "OK" status, LSL connected, session started with persisted configuration
+- **Progression**: View LSL status → Select active stream → Check electrode grid impedance (Fp1, Fp2, F3, F4, Cz, etc.) → Preview live signal quality for key channels → Review quick stats (channels, sample rate, packet loss, buffer) → Configure session metadata (patient ID, MRN, GA, weight, clinician, shift) → Start monitoring
+- **Success criteria**: All electrodes show "OK" status with clean waveform previews, LSL connected, session started with persisted configuration
 
 ### Multi-Channel EEG Review
-- **Functionality**: Playback and analyze historical EEG sessions with timeline navigation, event markers, spectral analysis, and annotation
-- **Purpose**: Enable clinicians to review seizure events, artifacts, and brain activity patterns for diagnosis
+- **Functionality**: Playback and analyze historical EEG sessions with multi-channel timeline rendering, event markers, spectral analysis, and annotation
+- **Purpose**: Enable clinicians to review seizure events, artifacts, and brain activity patterns for diagnosis with continuous 8-channel trend visualization
 - **Trigger**: Clinician selects session from Data tab or navigates to Review tab
-- **Progression**: Load session → Apply filters (interval, event type, artifact, montage) → Scrub timeline with transport controls → Inspect EEG trends, spectrogram, FFT → Add annotations → Export findings
-- **Success criteria**: Smooth playback, accurate event markers, spectrogram rendering, notes persisted to session
+- **Progression**: Load session → Apply filters (interval, event type, artifact, montage) → View multi-channel timeline with event overlays → Scrub timeline with transport controls → Inspect EEG trends, spectrogram, FFT → Add annotations → Export findings
+- **Success criteria**: Smooth timeline rendering with seizure event markers, accurate spectrogram display, notes persisted to session
 
 ### Session Data Management
 - **Functionality**: Browse, search, archive, and export EEG session recordings with integrity verification
@@ -41,11 +41,11 @@ BabEEG is a Class B medical device UI for neonatal EEG monitoring that combines 
 - **Success criteria**: Dataset imported without errors, sessions queryable, metadata extracted
 
 ### Comprehensive Live/Playback View
-- **Functionality**: Unified interface for live streaming and playback with impedance checks, electrode maps, accelerometer data, spectral analysis, and ops monitoring
-- **Purpose**: Provide single-pane clinical monitoring with quick access to all sensor modalities
+- **Functionality**: Unified interface for live streaming and playback with real-time EEG waveform rendering, impedance checks, electrode maps, accelerometer data, spectral analysis, and ops monitoring
+- **Purpose**: Provide single-pane clinical monitoring with high-performance multi-channel visualization and quick access to all sensor modalities
 - **Trigger**: Clinician navigates to Comprehensive tab
-- **Progression**: Toggle live/playback mode → View live EEG stream or load session → Switch between tabs (Live EEG, Impedance Check, Electrode Map, Accelerometer, Analysis, Ops Center) → Add markers → Export clips
-- **Success criteria**: Live stream renders without dropped frames, playback controls functional, marker CSV export valid
+- **Progression**: Toggle live/playback mode → View live EEG stream (60 FPS canvas rendering) with adjustable time window (1-30s) → Configure channel visibility and amplitude → Switch between tabs (Live EEG, Impedance Check, Electrode Map, Accelerometer, Analysis, Ops Center) → Add markers → Export clips
+- **Success criteria**: Live stream renders at 60 FPS without dropped frames, channel controls persist across sessions, playback controls functional, marker CSV export valid
 
 ### Innovation Sandbox
 - **Functionality**: Multi-patient grid view, mobile monitoring cards, spike review queue, and experimental features isolated from production workflows
@@ -137,7 +137,10 @@ Animations should be strictly functional—communicating state transitions, guid
 
 - **Customizations**:
   - **ElectrodeGrid** - Custom 3-5 column responsive grid with color-coded status badges per electrode (Fp1, Fp2, F3, etc.); impedance values on hover
-  - **TimeSeriesChart** - Canvas-based EEG waveform renderer for multi-channel display; leverages D3 for axes and scales
+  - **EEGWaveformCanvas** - High-performance Canvas-based live EEG renderer with 60 FPS multi-channel streaming; devicePixelRatio-aware scaling; synthetic signal generation with alpha/theta/beta bands and artifact simulation
+  - **LiveEEGStreamPanel** - Complete live monitoring interface with channel configuration controls (16 configurable channels with color coding); amplitude adjustment (20-200µV); channel visibility toggles; persisted preferences via useKV; real-time FPS display
+  - **TimelineEEG** - Compressed multi-channel timeline view for Review tab; 8-channel stacked layout with event marker overlays (seizure/artifact/annotation); Canvas-rendered for performance; displays 30-minute windows with trend visualization
+  - **MiniWaveform** - Compact signal quality preview for Setup tab; real-time animated waveform with quality indicators (good/fair/poor); 60px height for dashboard integration
   - **SpectrogramPanel** - Canvas heatmap visualization with frequency (Y) vs. time (X); color scale for power spectral density
   - **TransportControls** - Custom play/pause/seek/speed controls for Review playback; time code display
   - **MarkerTimeline** - SVG overlay on EEG timeline with draggable event markers; color-coded by type (seizure/artifact/note)

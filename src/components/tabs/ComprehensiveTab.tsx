@@ -9,9 +9,11 @@ import { Play, Pause, Stop, Plus, ArrowClockwise } from '@phosphor-icons/react'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Slider } from '@/components/ui/slider'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { LiveEEGStreamPanel } from '@/components/eeg/LiveEEGStreamPanel'
 
 export function ComprehensiveTab() {
   const [mode, setMode] = useState<'live' | 'playback'>('live')
+  const [timeWindow, setTimeWindow] = useState(10)
 
   return (
     <div className="space-y-4 p-6">
@@ -90,17 +92,25 @@ export function ComprehensiveTab() {
                   {mode === 'live' && (
                     <div className="flex items-center gap-2">
                       <Label className="text-sm">Time Window:</Label>
-                      <Input type="number" defaultValue={10} min={1} max={30} className="w-20" />
+                      <Input 
+                        type="number" 
+                        value={timeWindow}
+                        onChange={(e) => setTimeWindow(Number(e.target.value))}
+                        min={1} 
+                        max={30} 
+                        className="w-20" 
+                      />
                       <span className="text-sm text-muted-foreground">sec</span>
                     </div>
                   )}
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="h-96 rounded border border-border bg-muted/20 p-4">
-                  <div className="text-sm text-muted-foreground">
-                    {mode === 'live' ? 'Live EEG waveform display' : 'Playback EEG waveform display'}
-                  </div>
+                <div className="h-[32rem] rounded border border-border bg-background">
+                  <LiveEEGStreamPanel 
+                    timeWindow={timeWindow}
+                    isLive={mode === 'live'}
+                  />
                 </div>
                 {mode === 'playback' && (
                   <div className="mt-4 flex items-center gap-3">

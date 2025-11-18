@@ -7,8 +7,15 @@ import { Play, Pause, FastForward, Rewind } from '@phosphor-icons/react'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { Textarea } from '@/components/ui/textarea'
+import { TimelineEEG } from '@/components/eeg/TimelineEEG'
 
 export function ReviewTab() {
+  const sampleEvents = [
+    { time: 450, type: 'seizure' as const, label: 'Seizure Event' },
+    { time: 890, type: 'seizure' as const, label: 'Possible Seizure' },
+    { time: 1200, type: 'artifact' as const, label: 'Motion Artifact' },
+  ]
+
   return (
     <div className="space-y-4 p-6">
       <div className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card p-4">
@@ -74,12 +81,12 @@ export function ReviewTab() {
               <CardTitle>Timeline + Trends</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="h-48 rounded border border-border bg-muted/20 p-4">
-                <div className="text-sm text-muted-foreground">EEG Trend stack (8 channels)</div>
-                <div className="mt-2 flex gap-2">
-                  <Badge className="bg-[oklch(0.55_0.22_25)] text-white">Seizure</Badge>
-                  <Badge variant="outline">Annotation</Badge>
-                </div>
+              <div className="rounded border border-border bg-background p-4">
+                <TimelineEEG 
+                  duration={1800}
+                  channels={['Fp1', 'Fp2', 'F3', 'F4', 'C3', 'C4', 'Cz', 'P3']}
+                  events={sampleEvents}
+                />
               </div>
               <div className="h-32 rounded border border-border bg-muted/20 p-4">
                 <div className="text-sm text-muted-foreground">Accel XYZ + posture + motion flags</div>
