@@ -1,5 +1,7 @@
+import { useState, useEffect } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { GlobalHeader, PatientStrip, SafetyStrip, Footer } from '@/components/layout/GlobalLayout'
+import { SecurityBanner } from '@/components/layout/SecurityBanner'
 import { SetupTab } from '@/components/tabs/SetupTab'
 import { ReviewTab } from '@/components/tabs/ReviewTab'
 import { DataTab } from '@/components/tabs/DataTab'
@@ -7,13 +9,37 @@ import { ImportTab } from '@/components/tabs/ImportTab'
 import { ComprehensiveTab } from '@/components/tabs/ComprehensiveTab'
 import { InnovationTab } from '@/components/tabs/InnovationTab'
 import { Toaster } from '@/components/ui/sonner'
+import { useOfflineSync } from '@/hooks/use-offline-sync'
+import { Badge } from '@/components/ui/badge'
 
 function App() {
+  const { syncStatus } = useOfflineSync()
+  const [isRemoteAccess] = useState(false)
+
   return (
     <div className="flex min-h-screen flex-col">
       <GlobalHeader />
       <PatientStrip />
       <SafetyStrip />
+      
+      {isRemoteAccess && (
+        <div className="px-6 pt-4">
+          <SecurityBanner isRemote={isRemoteAccess} isOnline={syncStatus.isOnline} />
+        </div>
+      )}
+
+      {!syncStatus.isOnline && (
+        <div className="border-b border-border bg-muted px-6 py-2">
+          <div className="flex items-center gap-2 text-xs">
+            <Badge variant="secondary">Offline Mode</Badge>
+            {syncStatus.pendingChanges > 0 && (
+              <span className="text-muted-foreground">
+                {syncStatus.pendingChanges} change{syncStatus.pendingChanges !== 1 ? 's' : ''} pending sync
+              </span>
+            )}
+          </div>
+        </div>
+      )}
       
       <main className="flex-1">
         <Tabs defaultValue="setup" className="h-full">

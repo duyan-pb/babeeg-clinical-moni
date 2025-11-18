@@ -10,6 +10,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Slider } from '@/components/ui/slider'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { LiveEEGStreamPanel } from '@/components/eeg/LiveEEGStreamPanel'
+import { AEEGView } from '@/components/eeg/AEEGView'
 
 export function ComprehensiveTab() {
   const [mode, setMode] = useState<'live' | 'playback'>('live')
@@ -74,8 +75,9 @@ export function ComprehensiveTab() {
       </div>
 
       <Tabs defaultValue="live-eeg" className="w-full">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="live-eeg">Live EEG</TabsTrigger>
+          <TabsTrigger value="aeeg">aEEG</TabsTrigger>
           <TabsTrigger value="impedance">Impedance Check</TabsTrigger>
           <TabsTrigger value="electrode">Electrode Map</TabsTrigger>
           <TabsTrigger value="accel">Accelerometer</TabsTrigger>
@@ -170,6 +172,10 @@ export function ComprehensiveTab() {
               </CardContent>
             </Card>
           </div>
+        </TabsContent>
+
+        <TabsContent value="aeeg">
+          <AEEGView />
         </TabsContent>
 
         <TabsContent value="impedance">

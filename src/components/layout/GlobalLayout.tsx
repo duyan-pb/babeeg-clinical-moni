@@ -1,4 +1,8 @@
+import { useState } from 'react'
 import { Separator } from '@/components/ui/separator'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { HelpDialog } from './HelpDialog'
+import { AuditLogViewer } from './AuditLogViewer'
 
 export function GlobalHeader() {
   return (
@@ -86,22 +90,40 @@ export function SafetyStrip() {
 }
 
 export function Footer() {
+  const [auditDialogOpen, setAuditDialogOpen] = useState(false)
+
   return (
-    <div className="border-t border-border bg-card px-6 py-2">
-      <div className="flex items-center justify-between text-xs text-muted-foreground">
-        <div className="flex items-center gap-4">
-          <span>CPU: 12%</span>
-          <span>GPU: 8%</span>
-          <span>FPS: 60</span>
-          <span>Buffer: 45%</span>
-        </div>
-        <div className="flex-1" />
-        <div className="flex items-center gap-4">
-          <button className="hover:text-foreground">Help [?]</button>
-          <button className="hover:text-foreground">Audit Trail</button>
-          <button className="hover:text-foreground">Lock/Logout</button>
+    <>
+      <div className="border-t border-border bg-card px-6 py-2">
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <div className="flex items-center gap-4">
+            <span>CPU: 12%</span>
+            <span>GPU: 8%</span>
+            <span>FPS: 60</span>
+            <span>Buffer: 45%</span>
+          </div>
+          <div className="flex-1" />
+          <div className="flex items-center gap-4">
+            <HelpDialog />
+            <button 
+              className="hover:text-foreground"
+              onClick={() => setAuditDialogOpen(true)}
+            >
+              Audit Trail
+            </button>
+            <button className="hover:text-foreground">Lock/Logout</button>
+          </div>
         </div>
       </div>
-    </div>
+
+      <Dialog open={auditDialogOpen} onOpenChange={setAuditDialogOpen}>
+        <DialogContent className="max-w-5xl">
+          <DialogHeader>
+            <DialogTitle>Audit Trail</DialogTitle>
+          </DialogHeader>
+          <AuditLogViewer />
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }

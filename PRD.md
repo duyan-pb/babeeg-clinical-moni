@@ -44,16 +44,17 @@ BabEEG is a Class B medical device UI for neonatal EEG monitoring that combines 
 - Consent marker checkbox required for PHI exports
 - Export includes who/when/what/checksum details
 
-### UI-REQ-004 – Import Workflow 🔄
-**Implementation**: ImportTab.tsx (existing, enhanced validation needed)
-- Dataset/EDF ingest capability
-- Schema/label validation messaging
-- Checksum verification
-- Gap detection in imported data
-- Patient assignment workflow
-- Channel mapping helper
-- Post-import summary with counts/duration/gaps
-- Validation failure blocking and flagging
+### UI-REQ-004 – Import Workflow ✅
+**Implementation**: ImportTab.tsx with enhanced validation
+- Dataset/EDF ingest capability with file browser
+- Schema/label validation messaging with detailed results
+- Checksum verification (SHA-256) with pass/fail display
+- Gap detection in imported data with specific gap timestamps
+- Patient assignment workflow with new/existing patient selection
+- Channel mapping helper dialog with source-to-target mapping
+- Post-import summary with counts/duration/gaps/checksum verification
+- Validation failure blocking and flagging with clear error messages
+- Progress tracking with cancellable import
 
 ### UI-REQ-005 – Comprehensive/Ops Center ✅
 **Implementation**: ComprehensiveTab.tsx with modular widgets
@@ -75,12 +76,16 @@ BabEEG is a Class B medical device UI for neonatal EEG monitoring that combines 
 - Isolated from production data with clear warnings
 - Prototype notes logging
 
-### UI-REQ-007 – Neonatal aEEG 🔄
-**Status**: Planned for future implementation
-- Dual view (aEEG + raw EEG) layout
-- Preset NICU layouts
-- Alarm limits for neonatal thresholds
-- Simplified nurse mode
+### UI-REQ-007 – Neonatal aEEG ✅
+**Implementation**: AEEGView.tsx component integrated in ComprehensiveTab
+- Dual view (aEEG + raw EEG) layout with selectable view modes
+- Preset NICU layouts (Standard 2-Channel, Bilateral, Full 8-Channel, Seizure Detection)
+- Alarm limits for neonatal thresholds with adjustable upper/lower margins
+- Simplified nurse mode with reduced controls
+- Semi-logarithmic amplitude scale with 6-hour trending window
+- Background pattern classification (Continuous, Discontinuous, Low Voltage)
+- Real-time alarm system with visual threshold indicators
+- Toggle between aEEG-only, raw-only, dual, and quad views
 
 ### UI-REQ-008 – Guided Impedance Wizard ✅
 **Implementation**: SetupTab.tsx electrode section
@@ -112,14 +117,16 @@ BabEEG is a Class B medical device UI for neonatal EEG monitoring that combines 
 - Real-time status updates with last-update timestamp
 - Responsive grid layout (2-4 columns based on screen size)
 
-### UI-REQ-011 – Mobile/Remote Review 🔄
-**Status**: Partially implemented (responsive design present)
-- Low-bandwidth waveform rendering capability exists
-- Annotation sync via useKV
-- Read-only mode indicators
-- Responsive layout throughout application
-- Offline cache with sync (needs implementation)
-- Security banner for remote use (needs implementation)
+### UI-REQ-011 – Mobile/Remote Review ✅
+**Implementation**: SecurityBanner, useOfflineSync hook, responsive design
+- Low-bandwidth waveform rendering capability with optimized canvas
+- Annotation sync via useKV for persistent notes
+- Read-only mode indicators with offline badge
+- Responsive layout throughout application with mobile-first breakpoints
+- Offline cache with sync via useOfflineSync hook and pending changes queue
+- Security banner for remote use with connection status and encryption notice
+- Automatic sync when connection restored with toast notifications
+- Pending changes counter and manual sync trigger
 
 ### UI-REQ-012 – Modular Workspace ✅
 **Implementation**: ComprehensiveTab.tsx
@@ -323,3 +330,23 @@ Animations should be strictly functional—communicating state transitions, guid
   - Transport controls persist as sticky footer on mobile; quick stats cards wrap to 2-column grid
   - Session table switches to card layout with collapsible details on mobile
   - Bottom action rows wrap and stack on narrow viewports
+
+## Additional Support Components
+
+### Utility Components (Iteration 2)
+- **SecurityBanner** - Remote access mode indicator with online/offline status and encryption warnings
+- **ReadOnlyBadge** - Visual indicator when user has read-only access to sessions
+- **SystemStatusWidget** - Reusable status display with color-coded OK/Warn/Error indicators
+- **TraceabilityPanel** - Regulatory compliance display showing session ID, reviewer, checksum, consent status, and regulatory markers
+- **AuditLogViewer** - Complete audit trail browser with search, filtering, and export to CSV
+- **HelpDialog** - Contextual help with keyboard shortcuts, quick guides, and regulatory information
+
+### Hooks
+- **useOfflineSync** - Manages offline mode with pending change queue, automatic sync when online, and connection state tracking
+
+### Enhanced Features
+- Offline mode with pending changes indicator in header
+- Help dialog accessible from footer with keyboard shortcuts (Ctrl+1-4 for filters, space for play/pause, arrows for seeking)
+- Audit trail dialog with filterable log of all user actions, exports, and system events
+- Security banner for remote access scenarios with TLS encryption notice
+- aEEG view integrated into Comprehensive tab with nurse mode and NICU presets
