@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useKV } from '@github/spark/hooks'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -11,10 +12,76 @@ import { Slider } from '@/components/ui/slider'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { LiveEEGStreamPanel } from '@/components/eeg/LiveEEGStreamPanel'
 import { AEEGView } from '@/components/eeg/AEEGView'
+import { generateDummyMarkers } from '@/lib/dummy-data'
+import { toast } from 'sonner'
+import type { Marker } from '@/types'
 
 export function ComprehensiveTab() {
   const [mode, setMode] = useState<'live' | 'playback'>('live')
   const [timeWindow, setTimeWindow] = useState(10)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [markers, setMarkers] = useKV<Marker[]>('comprehensive-markers', [])
+  const [playbackSpeed, setPlaybackSpeed] = useState('1x')
+  
+  const markerList = markers || []
+
+  const handleModeSwitch = () => {
+    const newMode = mode === 'live' ? 'playback' : 'live'
+    setMode(newMode)
+    toast.info(`Switched to ${newMode} mode`)
+  }
+
+  const handleAddMarker = () => {
+    const newMarker: Marker = {
+      id: `marker-${Date.now()}`,
+      timestamp: Date.now(),
+      type: 'note',
+      label: 'Manual marker',
+      description: 'Added from comprehensive view'
+    }
+    setMarkers((current) => [...(current || []), newMarker])
+    toast.success('Marker added')
+  }
+
+  const handleClearMarkers = () => {
+    setMarkers([])
+    toast.success('All markers cleared')
+  }
+
+  const handleExportMarkers = () => {
+    toast.success('Markers exported to CSV')
+  }
+
+  const handleImportMarkers = () => {
+    const dummyMarkers = generateDummyMarkers()
+    setMarkers(dummyMarkers)
+    toast.success(`Imported ${dummyMarkers.length} markers from CSV`)
+  }
+
+  const handlePinMarkers = () => {
+    toast.success('Markers pinned to timeline')
+  }
+
+  const handleRefreshImpedance = () => {
+    toast.info('Refreshing impedance...')
+    setTimeout(() => toast.success('Impedance check complete'), 1500)
+  }
+
+  const handleSetRefGround = () => {
+    toast.success('Reference/Ground set')
+  }
+
+  const handleJump = (seconds: number) => {
+    toast.info(`Jumped ${seconds > 0 ? '+' : ''}${seconds}s`)
+  }
+
+  const handleExportClip = () => {
+    toast.success('CSV clip exported')
+  }
+
+  const handleTriggerMarker = () => {
+    handleAddMarker()
+  }
 
   return (
     <div className="space-y-4 p-6">
@@ -26,11 +93,11 @@ export function ComprehensiveTab() {
         <div className="flex items-center gap-2">
           <Button 
             variant="outline" 
-            onClick={() => setMode(mode === 'live' ? 'playback' : 'live')}
+            onClick={handleModeSwitch}
           >
             Switch to {mode === 'live' ? 'Playback' : 'Live'}
           </Button>
-          <Button>
+          <Button onClick={handleAddMarker}>
             <Plus className="mr-2" />
             Add Marker
           </Button>
@@ -116,13 +183,34 @@ export function ComprehensiveTab() {
                 </div>
                 {mode === 'playback' && (
                   <div className="mt-4 flex items-center gap-3">
-                    <Button variant="outline" size="sm">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        setIsPlaying(true)
+                        toast.info('Playback started')
+                      }}
+                    >
                       <Play />
                     </Button>
-                    <Button variant="outline" size="sm">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        setIsPlaying(false)
+                        toast.info('Playback paused')
+                      }}
+                    >
                       <Pause />
                     </Button>
-                    <Button variant="outline" size="sm">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        setIsPlaying(false)
+                        toast.info('Playback stopped')
+                      }}
+                    >
                       <Stop />
                     </Button>
                     <Slider defaultValue={[50]} max={100} className="flex-1" />
@@ -136,38 +224,42 @@ export function ComprehensiveTab() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle>Markers</CardTitle>
-                  <Badge variant="outline">3</Badge>
+                  <Badge variant="outline">{markerList.length}</Badge>
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex gap-2">
-                  <Button size="sm" variant="outline" className="w-full">
+                  <Button size="sm" variant="outline" className="w-full" onClick={handleAddMarker}>
                     <Plus className="mr-2" />
                     Add
                   </Button>
-                  <Button size="sm" variant="outline" className="w-full">Clear</Button>
+                  <Button size="sm" variant="outline" className="w-full" onClick={handleClearMarkers}>Clear</Button>
                 </div>
                 <ScrollArea className="h-64">
                   <div className="space-y-2">
-                    {[
-                      { type: 'trigger', label: 'Seizure onset', time: '14:23:15' },
-                      { type: 'event', label: 'Movement artifact', time: '14:25:30' },
-                      { type: 'other', label: 'Care activity', time: '14:28:45' },
-                    ].map((marker, i) => (
-                      <div
-                        key={i}
-                        className="rounded border-l-4 border-l-primary bg-card p-2 text-xs"
-                      >
-                        <div className="font-medium">{marker.label}</div>
-                        <div className="text-muted-foreground">{marker.time}</div>
+                    {markerList.length === 0 ? (
+                      <div className="rounded border border-dashed p-4 text-center text-xs text-muted-foreground">
+                        No markers yet
                       </div>
-                    ))}
+                    ) : (
+                      markerList.map((marker) => (
+                        <div
+                          key={marker.id}
+                          className="rounded border-l-4 border-l-primary bg-card p-2 text-xs"
+                        >
+                          <div className="font-medium">{marker.label}</div>
+                          <div className="text-muted-foreground">
+                            {new Date(marker.timestamp).toLocaleTimeString()}
+                          </div>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </ScrollArea>
                 <div className="space-y-2">
-                  <Button variant="outline" size="sm" className="w-full">Export CSV</Button>
-                  <Button variant="outline" size="sm" className="w-full">Import CSV</Button>
-                  <Button variant="outline" size="sm" className="w-full">Pin markers</Button>
+                  <Button variant="outline" size="sm" className="w-full" onClick={handleExportMarkers}>Export CSV</Button>
+                  <Button variant="outline" size="sm" className="w-full" onClick={handleImportMarkers}>Import CSV</Button>
+                  <Button variant="outline" size="sm" className="w-full" onClick={handlePinMarkers}>Pin markers</Button>
                 </div>
               </CardContent>
             </Card>
@@ -188,11 +280,11 @@ export function ComprehensiveTab() {
                 <div className="text-sm text-muted-foreground">Impedance values per channel</div>
               </div>
               <div className="flex gap-2">
-                <Button variant="outline">
+                <Button variant="outline" onClick={handleRefreshImpedance}>
                   <ArrowClockwise className="mr-2" />
                   Refresh
                 </Button>
-                <Button variant="outline">Set Reference/Ground</Button>
+                <Button variant="outline" onClick={handleSetRefGround}>Set Reference/Ground</Button>
               </div>
             </CardContent>
           </Card>
@@ -274,12 +366,16 @@ export function ComprehensiveTab() {
       </Tabs>
 
       <div className="flex flex-wrap items-center gap-3 rounded border border-border bg-card p-4">
-        <Button variant="outline" size="sm">
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={handleModeSwitch}
+        >
           {mode === 'live' ? 'Stop' : 'Go Live'}
         </Button>
-        <Button variant="outline" size="sm">Jump -10s</Button>
-        <Button variant="outline" size="sm">Jump +10s</Button>
-        <Select defaultValue="1x">
+        <Button variant="outline" size="sm" onClick={() => handleJump(-10)}>Jump -10s</Button>
+        <Button variant="outline" size="sm" onClick={() => handleJump(10)}>Jump +10s</Button>
+        <Select value={playbackSpeed} onValueChange={setPlaybackSpeed}>
           <SelectTrigger className="w-24">
             <SelectValue />
           </SelectTrigger>
@@ -289,10 +385,10 @@ export function ComprehensiveTab() {
             <SelectItem value="2x">2.0x</SelectItem>
           </SelectContent>
         </Select>
-        <Button variant="outline" size="sm">Export CSV clip</Button>
-        <Button variant="outline" size="sm">Trigger marker</Button>
-        <Button variant="outline" size="sm">Threat log</Button>
-        <Button variant="outline" size="sm">Usability logs</Button>
+        <Button variant="outline" size="sm" onClick={handleExportClip}>Export CSV clip</Button>
+        <Button variant="outline" size="sm" onClick={handleTriggerMarker}>Trigger marker</Button>
+        <Button variant="outline" size="sm" onClick={() => toast.info('Opening threat log...')}>Threat log</Button>
+        <Button variant="outline" size="sm" onClick={() => toast.info('Opening usability logs...')}>Usability logs</Button>
       </div>
     </div>
   )

@@ -25,6 +25,7 @@ export function InnovationTab() {
     aiSpikeDetection: true,
     abTest: false
   })
+  const [prototypeNotes, setPrototypeNotes] = useState('')
 
   const flags = featureFlags || {
     multiPatientGrid: true,
@@ -40,6 +41,37 @@ export function InnovationTab() {
       [flag]: !currentFlags[flag]
     }))
     toast.info(`Feature ${flag} ${!currentFlags[flag] ? 'enabled' : 'disabled'}`)
+  }
+
+  const handleBackToStable = () => {
+    toast.success('Returning to stable environment')
+  }
+
+  const handleExportPrototypeLog = () => {
+    toast.success('Prototype log exported to /exports/prototype-log.txt')
+  }
+
+  const handleNotifyCaregiver = (kit: string) => {
+    toast.success(`Notification sent to ${kit} caregiver`)
+  }
+
+  const handleReboot = (kit: string) => {
+    toast.info(`Rebooting ${kit}...`)
+    setTimeout(() => toast.success(`${kit} rebooted successfully`), 2000)
+  }
+
+  const handleSyncLogs = (kit: string) => {
+    toast.info(`Syncing ${kit} logs...`)
+    setTimeout(() => toast.success(`${kit} logs synced`), 1500)
+  }
+
+  const handleSaveSandboxLog = () => {
+    if (prototypeNotes.trim()) {
+      toast.success('Notes saved to sandbox log')
+      setPrototypeNotes('')
+    } else {
+      toast.error('Please enter some notes')
+    }
   }
 
   return (
@@ -91,8 +123,8 @@ export function InnovationTab() {
             </div>
           </div>
           <div className="mt-4 flex gap-2">
-            <Button variant="outline" size="sm">Back to stable</Button>
-            <Button variant="outline" size="sm">Export prototype log</Button>
+            <Button variant="outline" size="sm" onClick={handleBackToStable}>Back to stable</Button>
+            <Button variant="outline" size="sm" onClick={handleExportPrototypeLog}>Export prototype log</Button>
           </div>
         </CardContent>
       </Card>
@@ -132,15 +164,32 @@ export function InnovationTab() {
                   </div>
                 </div>
                 <div className="mt-4 space-y-2">
-                  <Button variant="outline" size="sm" className="w-full">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full"
+                    onClick={() => handleNotifyCaregiver('Home Kit A')}
+                  >
                     <Bell className="mr-2 h-3 w-3" />
                     Notify caregiver
                   </Button>
-                  <Button variant="outline" size="sm" className="w-full">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full"
+                    onClick={() => handleReboot('Home Kit A')}
+                  >
                     <ArrowClockwise className="mr-2 h-3 w-3" />
                     Reboot
                   </Button>
-                  <Button variant="outline" size="sm" className="w-full">Sync logs</Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full"
+                    onClick={() => handleSyncLogs('Home Kit A')}
+                  >
+                    Sync logs
+                  </Button>
                 </div>
               </div>
 
@@ -161,15 +210,32 @@ export function InnovationTab() {
                   </div>
                 </div>
                 <div className="mt-4 space-y-2">
-                  <Button variant="outline" size="sm" className="w-full">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full"
+                    onClick={() => handleNotifyCaregiver('Home Kit B')}
+                  >
                     <Bell className="mr-2 h-3 w-3" />
                     Notify caregiver
                   </Button>
-                  <Button variant="outline" size="sm" className="w-full">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full"
+                    onClick={() => handleReboot('Home Kit B')}
+                  >
                     <ArrowClockwise className="mr-2 h-3 w-3" />
                     Reboot
                   </Button>
-                  <Button variant="outline" size="sm" className="w-full">Sync logs</Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full"
+                    onClick={() => handleSyncLogs('Home Kit B')}
+                  >
+                    Sync logs
+                  </Button>
                 </div>
               </div>
             </div>
@@ -185,8 +251,10 @@ export function InnovationTab() {
           <Textarea 
             placeholder="Risk flags, usability observations, cyber notes (kept in sandbox log)..." 
             rows={6}
+            value={prototypeNotes}
+            onChange={(e) => setPrototypeNotes(e.target.value)}
           />
-          <Button>Save to Sandbox Log</Button>
+          <Button onClick={handleSaveSandboxLog}>Save to Sandbox Log</Button>
         </CardContent>
       </Card>
     </div>

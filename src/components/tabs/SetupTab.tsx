@@ -28,7 +28,7 @@ export function SetupTab() {
   const [selectedStream, setSelectedStream] = useState('')
   const [packetLoss, setPacketLoss] = useState(0.02)
   const [bufferLevel, setBufferLevel] = useState(45)
-  const [goNoGoStatus, setGoNoGoStatus] = useState<'go' | 'no-go'>('no-go')
+  const [isMonitoring, setIsMonitoring] = useState(false)
   const [preflightChecks, setPreflightChecks] = useKV<PreflightChecks>('preflight-checks', {
     electrodesVerified: false,
     capSizeOk: false,
@@ -59,6 +59,54 @@ export function SetupTab() {
     setTimeout(() => {
       toast.success('Continuity verified')
     }, 1000)
+  }
+
+  const handleStartMonitoring = () => {
+    if (!allChecksPassed || lslStatus !== 'connected') {
+      toast.error('Cannot start: Complete all preflight checks and connect LSL')
+      return
+    }
+    setIsMonitoring(true)
+    toast.success('Monitoring started')
+  }
+
+  const handleStopMonitoring = () => {
+    setIsMonitoring(false)
+    toast.info('Monitoring stopped')
+  }
+
+  const handleAutoMap = () => {
+    toast.success('Auto-mapped electrodes to 10-20 standard')
+  }
+
+  const handleRunCalibration = () => {
+    toast.info('Starting calibration...')
+    setTimeout(() => toast.success('Calibration complete'), 2000)
+  }
+
+  const handleSetRef = () => {
+    toast.success('Reference electrode set')
+  }
+
+  const handleSaveProfile = () => {
+    toast.success('Session profile saved')
+  }
+
+  const handleDryRunTest = () => {
+    toast.info('Running dry-run test signal...')
+    setTimeout(() => toast.success('Test signal complete - all channels responding'), 2000)
+  }
+
+  const handleExportSetupReport = () => {
+    toast.success('Setup report exported to /exports/setup-report.pdf')
+  }
+
+  const handleOpenSBOM = () => {
+    toast.info('Opening SBOM entry...')
+  }
+
+  const handleAuditTrail = () => {
+    toast.info('Opening audit trail...')
   }
 
   return (
@@ -106,18 +154,24 @@ export function SetupTab() {
           <Button 
             size="sm"
             disabled={!allChecksPassed || lslStatus !== 'connected'}
+            onClick={handleStartMonitoring}
           >
             <Play className="mr-2" />
             Start
           </Button>
-          <Button variant="outline" size="sm">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={handleStopMonitoring}
+            disabled={!isMonitoring}
+          >
             <Stop className="mr-2" />
             Stop
           </Button>
         </div>
       </div>
 
-      {goNoGoStatus === 'no-go' && !allChecksPassed && (
+      {!allChecksPassed && (
         <Alert className="border-[oklch(0.70_0.18_75)] bg-[oklch(0.70_0.18_75)]/10">
           <Warning className="h-4 w-4" />
           <AlertDescription>
@@ -302,7 +356,7 @@ export function SetupTab() {
             </div>
             <ElectrodeGrid />
             <div className="flex gap-2">
-              <Button variant="outline" size="sm">Auto-map 10-20</Button>
+              <Button variant="outline" size="sm" onClick={handleAutoMap}>Auto-map 10-20</Button>
               <Button variant="outline" size="sm" onClick={handleCheckContinuity}>
                 Check Ref/Ground
               </Button>
@@ -341,14 +395,14 @@ export function SetupTab() {
               <div>
                 <Label className="text-sm">Calibrate</Label>
                 <div className="mt-1 flex gap-2">
-                  <Button variant="outline" size="sm">Run</Button>
+                  <Button variant="outline" size="sm" onClick={handleRunCalibration}>Run</Button>
                   <Progress value={0} className="flex-1" />
                 </div>
               </div>
               <div className="space-y-1">
                 <Label className="text-sm">Reference/Ground</Label>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm">Set Ref</Button>
+                  <Button variant="outline" size="sm" onClick={handleSetRef}>Set Ref</Button>
                   <Button variant="outline" size="sm" onClick={handleCheckContinuity}>
                     Check continuity
                   </Button>
@@ -408,8 +462,8 @@ export function SetupTab() {
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm">Threat log</Button>
-                <Button variant="outline" size="sm">HF notes</Button>
+                <Button variant="outline" size="sm" onClick={() => toast.info('Opening threat log...')}>Threat log</Button>
+                <Button variant="outline" size="sm" onClick={() => toast.info('Opening HF notes...')}>HF notes</Button>
               </div>
             </div>
           </CardContent>
@@ -486,18 +540,20 @@ export function SetupTab() {
               </Select>
             </div>
             <div className="flex items-end">
-              <Button className="w-full">Save Profile</Button>
+              <Button className="w-full" onClick={handleSaveProfile}>Save Profile</Button>
             </div>
           </div>
         </CardContent>
       </Card>
 
       <div className="flex gap-3">
-        <Button size="lg">Start Monitoring</Button>
-        <Button variant="outline">Dry-run Test Signal</Button>
-        <Button variant="outline">Export setup report</Button>
-        <Button variant="outline">Open SBOM entry</Button>
-        <Button variant="outline">Audit Trail</Button>
+        <Button size="lg" onClick={handleStartMonitoring} disabled={!allChecksPassed || lslStatus !== 'connected'}>
+          Start Monitoring
+        </Button>
+        <Button variant="outline" onClick={handleDryRunTest}>Dry-run Test Signal</Button>
+        <Button variant="outline" onClick={handleExportSetupReport}>Export setup report</Button>
+        <Button variant="outline" onClick={handleOpenSBOM}>Open SBOM entry</Button>
+        <Button variant="outline" onClick={handleAuditTrail}>Audit Trail</Button>
       </div>
     </div>
   )

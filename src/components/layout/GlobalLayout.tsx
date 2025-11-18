@@ -1,8 +1,18 @@
 import { useState } from 'react'
+import { useKV } from '@github/spark/hooks'
 import { Separator } from '@/components/ui/separator'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { HelpDialog } from './HelpDialog'
 import { AuditLogViewer } from './AuditLogViewer'
+import { toast } from 'sonner'
+
+interface PatientData {
+  mrn: string
+  ga: string
+  weight: string
+  clinician: string
+  shift: 'Day' | 'Night'
+}
 
 export function GlobalHeader() {
   return (
@@ -22,6 +32,29 @@ export function GlobalHeader() {
 }
 
 export function PatientStrip() {
+  const [patientData, setPatientData] = useKV<PatientData>('patient-data', {
+    mrn: '',
+    ga: '',
+    weight: '',
+    clinician: '',
+    shift: 'Day'
+  })
+
+  const data = patientData || {
+    mrn: '',
+    ga: '',
+    weight: '',
+    clinician: '',
+    shift: 'Day' as const
+  }
+
+  const handleUpdate = (field: keyof PatientData, value: string) => {
+    setPatientData((current) => ({
+      ...(current || data),
+      [field]: value
+    }))
+  }
+
   return (
     <div className="border-b border-border bg-muted/30 px-6 py-2">
       <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs">
@@ -35,6 +68,8 @@ export function PatientStrip() {
             type="text" 
             className="h-6 w-24 rounded border border-input bg-background px-2 text-xs"
             placeholder="Enter MRN"
+            value={data.mrn}
+            onChange={(e) => handleUpdate('mrn', e.target.value)}
           />
         </div>
         <div className="flex items-center gap-2">
@@ -43,6 +78,8 @@ export function PatientStrip() {
             type="text" 
             className="h-6 w-16 rounded border border-input bg-background px-2 text-xs"
             placeholder="weeks"
+            value={data.ga}
+            onChange={(e) => handleUpdate('ga', e.target.value)}
           />
         </div>
         <div className="flex items-center gap-2">
@@ -51,6 +88,8 @@ export function PatientStrip() {
             type="text" 
             className="h-6 w-20 rounded border border-input bg-background px-2 text-xs"
             placeholder="grams"
+            value={data.weight}
+            onChange={(e) => handleUpdate('weight', e.target.value)}
           />
         </div>
         <div className="flex items-center gap-2">
@@ -59,11 +98,17 @@ export function PatientStrip() {
             type="text" 
             className="h-6 w-28 rounded border border-input bg-background px-2 text-xs"
             placeholder="Dr."
+            value={data.clinician}
+            onChange={(e) => handleUpdate('clinician', e.target.value)}
           />
         </div>
         <div className="flex items-center gap-2">
           <span className="text-muted-foreground">Shift:</span>
-          <select className="h-6 rounded border border-input bg-background px-2 text-xs">
+          <select 
+            className="h-6 rounded border border-input bg-background px-2 text-xs"
+            value={data.shift}
+            onChange={(e) => handleUpdate('shift', e.target.value as 'Day' | 'Night')}
+          >
             <option>Day</option>
             <option>Night</option>
           </select>
@@ -92,6 +137,11 @@ export function SafetyStrip() {
 export function Footer() {
   const [auditDialogOpen, setAuditDialogOpen] = useState(false)
 
+  const handleLockLogout = () => {
+    toast.info('Locking session...')
+    setTimeout(() => toast.success('Session locked'), 1000)
+  }
+
   return (
     <>
       <div className="border-t border-border bg-card px-6 py-2">
@@ -111,7 +161,12 @@ export function Footer() {
             >
               Audit Trail
             </button>
-            <button className="hover:text-foreground">Lock/Logout</button>
+            <button 
+              className="hover:text-foreground"
+              onClick={handleLockLogout}
+            >
+              Lock/Logout
+            </button>
           </div>
         </div>
       </div>

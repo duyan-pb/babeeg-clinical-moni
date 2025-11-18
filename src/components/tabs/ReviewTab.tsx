@@ -18,6 +18,11 @@ export function ReviewTab() {
   const [playbackSpeed, setPlaybackSpeed] = useState('1x')
   const [currentTime, setCurrentTime] = useState(0)
   const [exportDialogOpen, setExportDialogOpen] = useState(false)
+  const [selectedInterval, setSelectedInterval] = useState('30m')
+  const [selectedEventType, setSelectedEventType] = useState('seizure')
+  const [selectedArtifact, setSelectedArtifact] = useState('hide')
+  const [selectedMontage, setSelectedMontage] = useState('10-20')
+  const [annotation, setAnnotation] = useState('')
   
   const sampleEvents = [
     { time: 450, type: 'seizure' as const, label: 'Seizure Event' },
@@ -35,12 +40,50 @@ export function ReviewTab() {
     toast.info(`Seeked ${delta > 0 ? '+' : ''}${delta}s`)
   }
 
+  const handleApplyFilters = () => {
+    toast.success(`Applied filters: ${selectedInterval}, ${selectedEventType}, ${selectedMontage}`)
+  }
+
+  const handleResetFilters = () => {
+    setSelectedInterval('30m')
+    setSelectedEventType('seizure')
+    setSelectedArtifact('hide')
+    setSelectedMontage('10-20')
+    toast.info('Filters reset to defaults')
+  }
+
+  const handleSaveAnnotation = () => {
+    if (annotation.trim()) {
+      toast.success('Annotation saved')
+      setAnnotation('')
+    } else {
+      toast.error('Please enter an annotation')
+    }
+  }
+
+  const handleAttachToEvent = () => {
+    if (annotation.trim()) {
+      toast.success('Annotation attached to current event')
+      setAnnotation('')
+    } else {
+      toast.error('Please enter an annotation')
+    }
+  }
+
+  const handleGoLive = () => {
+    toast.success('Switching to live mode')
+  }
+
+  const handleSendToReviewQueue = () => {
+    toast.success('Current clip sent to review queue')
+  }
+
   return (
     <div className="space-y-4 p-6">
       <div className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card p-4">
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">Interval:</span>
-          <Select defaultValue="30m">
+          <Select value={selectedInterval} onValueChange={setSelectedInterval}>
             <SelectTrigger className="w-32">
               <SelectValue />
             </SelectTrigger>
@@ -54,7 +97,7 @@ export function ReviewTab() {
         </div>
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">Event Type:</span>
-          <Select defaultValue="seizure">
+          <Select value={selectedEventType} onValueChange={setSelectedEventType}>
             <SelectTrigger className="w-32">
               <SelectValue />
             </SelectTrigger>
@@ -67,7 +110,7 @@ export function ReviewTab() {
         </div>
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">Artifact:</span>
-          <Select defaultValue="hide">
+          <Select value={selectedArtifact} onValueChange={setSelectedArtifact}>
             <SelectTrigger className="w-36">
               <SelectValue />
             </SelectTrigger>
@@ -79,7 +122,7 @@ export function ReviewTab() {
         </div>
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">Montage:</span>
-          <Select defaultValue="10-20">
+          <Select value={selectedMontage} onValueChange={setSelectedMontage}>
             <SelectTrigger className="w-32">
               <SelectValue />
             </SelectTrigger>
@@ -89,8 +132,8 @@ export function ReviewTab() {
             </SelectContent>
           </Select>
         </div>
-        <Button size="sm">Apply</Button>
-        <Button variant="outline" size="sm">Reset</Button>
+        <Button size="sm" onClick={handleApplyFilters}>Apply</Button>
+        <Button variant="outline" size="sm" onClick={handleResetFilters}>Reset</Button>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_400px]">
@@ -134,10 +177,15 @@ export function ReviewTab() {
               <CardTitle>Annotations</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <Textarea placeholder="Add clinical notes and observations..." rows={4} />
+              <Textarea 
+                placeholder="Add clinical notes and observations..." 
+                rows={4}
+                value={annotation}
+                onChange={(e) => setAnnotation(e.target.value)}
+              />
               <div className="flex gap-2">
-                <Button size="sm">Save Annotation</Button>
-                <Button variant="outline" size="sm">Attach to Event</Button>
+                <Button size="sm" onClick={handleSaveAnnotation}>Save Annotation</Button>
+                <Button variant="outline" size="sm" onClick={handleAttachToEvent}>Attach to Event</Button>
               </div>
             </CardContent>
           </Card>
@@ -241,7 +289,7 @@ export function ReviewTab() {
               <span className="text-muted-foreground">Position:</span>
               <span className="font-mono">{Math.floor(currentTime / 60)}:{(currentTime % 60).toString().padStart(2, '0')}</span>
             </div>
-            <Button variant="outline" size="sm">Go Live</Button>
+            <Button variant="outline" size="sm" onClick={handleGoLive}>Go Live</Button>
             <Button 
               variant="outline" 
               size="sm"
@@ -250,7 +298,7 @@ export function ReviewTab() {
               <Download className="mr-2 h-4 w-4" />
               Export Clip
             </Button>
-            <Button variant="outline" size="sm">Send to Review Queue</Button>
+            <Button variant="outline" size="sm" onClick={handleSendToReviewQueue}>Send to Review Queue</Button>
           </div>
         </CardContent>
       </Card>
