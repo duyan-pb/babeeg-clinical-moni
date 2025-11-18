@@ -196,7 +196,7 @@ export function ComprehensiveTab() {
         </TabsContent>
 
         <TabsContent value="aeeg">
-          <AEEGView />
+          <AEEGView isLive={mode === 'live'} />
         </TabsContent>
 
         <TabsContent value="impedance">
