@@ -1,0 +1,107 @@
+import { Separator } from '@/components/ui/separator'
+
+export function GlobalHeader() {
+  return (
+    <div className="border-b border-border bg-card">
+      <div className="flex items-center justify-between px-6 py-3">
+        <div className="flex items-center gap-8">
+          <h1 className="text-xl font-semibold tracking-tight">BabEEG</h1>
+        </div>
+        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+          <span>LSL: Disconnected</span>
+          <span>License: Active</span>
+          <span>SBOM</span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export function PatientStrip() {
+  return (
+    <div className="border-b border-border bg-muted/30 px-6 py-2">
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs">
+        <div className="flex items-center gap-2">
+          <span className="text-muted-foreground">Patient:</span>
+          <span className="font-medium">Neo-##</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-muted-foreground">MRN:</span>
+          <input 
+            type="text" 
+            className="h-6 w-24 rounded border border-input bg-background px-2 text-xs"
+            placeholder="Enter MRN"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-muted-foreground">GA:</span>
+          <input 
+            type="text" 
+            className="h-6 w-16 rounded border border-input bg-background px-2 text-xs"
+            placeholder="weeks"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-muted-foreground">Weight:</span>
+          <input 
+            type="text" 
+            className="h-6 w-20 rounded border border-input bg-background px-2 text-xs"
+            placeholder="grams"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-muted-foreground">Clinician:</span>
+          <input 
+            type="text" 
+            className="h-6 w-28 rounded border border-input bg-background px-2 text-xs"
+            placeholder="Dr."
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-muted-foreground">Shift:</span>
+          <select className="h-6 rounded border border-input bg-background px-2 text-xs">
+            <option>Day</option>
+            <option>Night</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export function SafetyStrip() {
+  return (
+    <div className="border-b border-border bg-muted/20 px-6 py-2">
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-1 text-[10px] text-muted-foreground">
+        <span className="font-medium">IEC62304 Class B</span>
+        <span>ISO14971</span>
+        <span>IEC62366</span>
+        <span>Cyber (81001-5-1)</span>
+        <span>UI-REQ-ID</span>
+        <span>Hazard ID</span>
+        <span className="ml-auto">Audit Trail [ ]</span>
+      </div>
+    </div>
+  )
+}
+
+export function Footer() {
+  return (
+    <div className="border-t border-border bg-card px-6 py-2">
+      <div className="flex items-center justify-between text-xs text-muted-foreground">
+        <div className="flex items-center gap-4">
+          <span>CPU: 12%</span>
+          <span>GPU: 8%</span>
+          <span>FPS: 60</span>
+          <span>Buffer: 45%</span>
+        </div>
+        <div className="flex-1" />
+        <div className="flex items-center gap-4">
+          <button className="hover:text-foreground">Help [?]</button>
+          <button className="hover:text-foreground">Audit Trail</button>
+          <button className="hover:text-foreground">Lock/Logout</button>
+        </div>
+      </div>
+    </div>
+  )
+}
