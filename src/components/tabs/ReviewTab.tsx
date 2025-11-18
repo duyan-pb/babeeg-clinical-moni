@@ -62,8 +62,8 @@ export function ReviewTab() {
   const isLive = playbackState.mode === 'live'
 
   return (
-    <div className="flex h-[calc(100vh-200px)] flex-col gap-4 p-6">
-      <div className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card p-4">
+    <div className="flex h-full flex-col gap-4 p-6">
+      <div className="flex flex-shrink-0 flex-wrap items-center gap-3 rounded-lg border border-border bg-card p-4">
         <div className="flex items-center gap-2">
           <Switch
             id="mode-toggle"
@@ -122,8 +122,8 @@ export function ReviewTab() {
 
       <div className="flex min-h-0 flex-1 gap-4">
         <div className="flex min-h-0 flex-[3] flex-col gap-4">
-          <Card className="min-h-0 flex-1 overflow-hidden">
-            <CardHeader className="pb-3">
+          <Card className="flex min-h-0 flex-1 flex-col overflow-hidden">
+            <CardHeader className="flex-shrink-0 pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle>EEG Waveforms</CardTitle>
                 <Badge variant={isLive ? 'destructive' : 'outline'}>
@@ -131,13 +131,13 @@ export function ReviewTab() {
                 </Badge>
               </div>
             </CardHeader>
-            <CardContent className="h-[calc(100%-60px)] p-0">
+            <CardContent className="min-h-0 flex-1 p-0">
               <LiveEEGStreamPanel timeWindow={timeWindow} isLive={isLive} />
             </CardContent>
           </Card>
 
           {!isLive && (
-            <Card>
+            <Card className="flex-shrink-0">
               <CardContent className="p-4">
                 <EnhancedPlaybackControls sessionId="review-session" />
               </CardContent>
@@ -145,26 +145,26 @@ export function ReviewTab() {
           )}
         </div>
 
-        <div className="flex min-h-0 flex-[2] flex-col">
-          <Tabs defaultValue="analysis" className="flex h-full flex-col">
-            <TabsList className="grid w-full grid-cols-3">
+        <div className="flex min-h-0 flex-[2] flex-col overflow-hidden">
+          <Tabs defaultValue="analysis" className="flex h-full flex-col overflow-hidden">
+            <TabsList className="grid w-full flex-shrink-0 grid-cols-3">
               <TabsTrigger value="analysis">Analysis</TabsTrigger>
               <TabsTrigger value="monitoring">Monitor</TabsTrigger>
               <TabsTrigger value="notes">Notes</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="analysis" className="mt-4 flex-1 space-y-4 overflow-auto">
+            <TabsContent value="analysis" className="mt-4 min-h-0 flex-1 space-y-4 overflow-auto">
               <Spectrogram channelId="Fp1" isLive={isLive} timeWindow={30} />
               <FrequencyDomainAnalyzer channelId="Fp1" isLive={isLive} />
             </TabsContent>
 
-            <TabsContent value="monitoring" className="mt-4 flex-1 space-y-4 overflow-auto">
+            <TabsContent value="monitoring" className="mt-4 min-h-0 flex-1 space-y-4 overflow-auto">
               <AccelerometerStream isLive={isLive} timeWindow={timeWindow} />
               <ElectrodeScalpMap />
               <ImpedanceChecker />
             </TabsContent>
 
-            <TabsContent value="notes" className="mt-4 flex-1 space-y-4 overflow-auto">
+            <TabsContent value="notes" className="mt-4 min-h-0 flex-1 space-y-4 overflow-auto">
               <Card>
                 <CardHeader className="pb-3">
                   <CardTitle>Annotations</CardTitle>

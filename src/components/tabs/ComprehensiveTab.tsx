@@ -90,13 +90,14 @@ export function ComprehensiveTab() {
   }
 
   return (
-    <div className="space-y-4 p-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+    <div className="h-full overflow-auto">
+      <div className="space-y-4 p-6">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-4">
           <h2 className="text-xl font-semibold">BabEEG Comprehensive View</h2>
           <Badge variant="outline">Mode: {mode === 'live' ? 'Live' : 'Playback'}</Badge>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button 
             variant="outline" 
             onClick={handleModeSwitch}
@@ -179,8 +180,8 @@ export function ComprehensiveTab() {
                 )}
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="h-[32rem] rounded border border-border bg-background">
+            <CardContent className="overflow-hidden">
+              <div className="h-96 w-full">
                 <LiveEEGStreamPanel 
                   timeWindow={timeWindow}
                   isLive={mode === 'live'}
@@ -255,6 +256,7 @@ export function ComprehensiveTab() {
         <Button variant="outline" size="sm" onClick={handleTriggerMarker}>Trigger marker</Button>
         <Button variant="outline" size="sm" onClick={() => toast.info('Opening threat log...')}>Threat log</Button>
         <Button variant="outline" size="sm" onClick={() => toast.info('Opening usability logs...')}>Usability logs</Button>
+      </div>
       </div>
     </div>
   )

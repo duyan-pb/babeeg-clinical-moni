@@ -113,9 +113,10 @@ export function DataTab() {
   })
 
   return (
-    <div className="space-y-4 p-6">
-      <div className="flex items-center justify-between rounded-lg border border-border bg-card p-4">
-        <div className="flex items-center gap-4 text-sm">
+    <div className="h-full overflow-auto">
+      <div className="space-y-4 p-6">
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-lg border border-border bg-card p-4">
+        <div className="flex flex-wrap items-center gap-4 text-sm">
           <span><span className="font-semibold">82%</span> used</span>
           <span>Data root: <span className="font-medium">/data/babeeg</span></span>
           <span>Retention: <span className="font-medium">90d</span></span>
@@ -130,7 +131,7 @@ export function DataTab() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Sessions</CardTitle>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <Input 
                     placeholder="Search..." 
                     className="w-48" 
@@ -144,7 +145,7 @@ export function DataTab() {
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="overflow-auto">
               <div className="mb-3 flex gap-2">
                 <Badge 
                   variant={filterType === 'all' ? 'default' : 'outline'} 
@@ -398,6 +399,7 @@ export function DataTab() {
         onOpenChange={setExportDialogOpen}
         sessionId={selectedSession?.id}
       />
+      </div>
     </div>
   )
 }

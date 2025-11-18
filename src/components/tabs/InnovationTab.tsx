@@ -75,7 +75,8 @@ export function InnovationTab() {
   }
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="h-full overflow-auto">
+      <div className="space-y-6 p-6">
       <Alert className="border-[oklch(0.70_0.18_75)] bg-[oklch(0.70_0.18_75)]/10">
         <Flask className="h-4 w-4" />
         <AlertDescription>
@@ -122,7 +123,7 @@ export function InnovationTab() {
               />
             </div>
           </div>
-          <div className="mt-4 flex gap-2">
+          <div className="mt-4 flex flex-wrap gap-2">
             <Button variant="outline" size="sm" onClick={handleBackToStable}>Back to stable</Button>
             <Button variant="outline" size="sm" onClick={handleExportPrototypeLog}>Export prototype log</Button>
           </div>
@@ -257,6 +258,7 @@ export function InnovationTab() {
           <Button onClick={handleSaveSandboxLog}>Save to Sandbox Log</Button>
         </CardContent>
       </Card>
+      </div>
     </div>
   )
 }

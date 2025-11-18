@@ -110,7 +110,8 @@ export function SetupTab() {
   }
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="h-full overflow-auto">
+      <div className="space-y-6 p-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h2 className="text-xl font-semibold">BabEEG Setup</h2>
         <div className="flex flex-wrap items-center gap-3">
@@ -355,7 +356,7 @@ export function SetupTab() {
               </div>
             </div>
             <ElectrodeGrid />
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Button variant="outline" size="sm" onClick={handleAutoMap}>Auto-map 10-20</Button>
               <Button variant="outline" size="sm" onClick={handleCheckContinuity}>
                 Check Ref/Ground
@@ -370,7 +371,7 @@ export function SetupTab() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-3">
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <Button 
                   variant="outline" 
                   size="sm"
@@ -394,14 +395,14 @@ export function SetupTab() {
               </div>
               <div>
                 <Label className="text-sm">Calibrate</Label>
-                <div className="mt-1 flex gap-2">
+                <div className="mt-1 flex flex-wrap gap-2">
                   <Button variant="outline" size="sm" onClick={handleRunCalibration}>Run</Button>
                   <Progress value={0} className="flex-1" />
                 </div>
               </div>
               <div className="space-y-1">
                 <Label className="text-sm">Reference/Ground</Label>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   <Button variant="outline" size="sm" onClick={handleSetRef}>Set Ref</Button>
                   <Button variant="outline" size="sm" onClick={handleCheckContinuity}>
                     Check continuity
@@ -461,7 +462,7 @@ export function SetupTab() {
                   </div>
                 </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <Button variant="outline" size="sm" onClick={() => toast.info('Opening threat log...')}>Threat log</Button>
                 <Button variant="outline" size="sm" onClick={() => toast.info('Opening HF notes...')}>HF notes</Button>
               </div>
@@ -546,7 +547,7 @@ export function SetupTab() {
         </CardContent>
       </Card>
 
-      <div className="flex gap-3">
+      <div className="flex flex-wrap gap-3">
         <Button size="lg" onClick={handleStartMonitoring} disabled={!allChecksPassed || lslStatus !== 'connected'}>
           Start Monitoring
         </Button>
@@ -554,6 +555,7 @@ export function SetupTab() {
         <Button variant="outline" onClick={handleExportSetupReport}>Export setup report</Button>
         <Button variant="outline" onClick={handleOpenSBOM}>Open SBOM entry</Button>
         <Button variant="outline" onClick={handleAuditTrail}>Audit Trail</Button>
+      </div>
       </div>
     </div>
   )

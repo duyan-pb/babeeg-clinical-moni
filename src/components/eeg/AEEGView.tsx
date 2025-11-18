@@ -18,7 +18,8 @@ export function AEEGView() {
   const [lowerMargin, setLowerMargin] = useState([5])
 
   return (
-    <div className="space-y-4 p-6">
+    <div className="h-full overflow-auto">
+      <div className="space-y-4 p-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <h2 className="text-lg font-semibold">Neonatal aEEG View</h2>
@@ -219,6 +220,7 @@ export function AEEGView() {
             </Alert>
           )}
         </div>
+      </div>
       </div>
     </div>
   )

@@ -82,11 +82,13 @@ function App() {
         </div>
       )}
       
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex min-h-0 flex-1 overflow-hidden">
         <LeftNav activeView={activeView} onViewChange={setActiveView} />
         
         <main className="flex-1 overflow-auto">
-          {renderContent()}
+          <div className="h-full">
+            {renderContent()}
+          </div>
         </main>
       </div>
 

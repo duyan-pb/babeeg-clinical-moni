@@ -145,7 +145,8 @@ export function ImportTab() {
   }
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="h-full overflow-auto">
+      <div className="space-y-6 p-6">
       <Card>
         <CardHeader>
           <CardTitle>Import EDF/EDF+ File</CardTitle>
@@ -205,7 +206,7 @@ export function ImportTab() {
             </div>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button 
               onClick={handleValidate} 
               disabled={!selectedFile || validationStatus === 'validating'}
@@ -336,7 +337,7 @@ export function ImportTab() {
             <DialogTitle>Channel Mapping</DialogTitle>
             <DialogDescription>Map source EDF channels to standard BabEEG channels</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className="max-h-[60vh] space-y-4 overflow-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -434,6 +435,7 @@ export function ImportTab() {
           </div>
         </DialogContent>
       </Dialog>
+      </div>
     </div>
   )
 }
