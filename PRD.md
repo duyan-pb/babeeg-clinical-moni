@@ -10,6 +10,154 @@ BabEEG is a Class B medical device UI for neonatal EEG monitoring that combines 
 **Complexity Level**: Complex Application (advanced functionality, accounts)
   - Multi-tab workflow spanning device setup, real-time monitoring, historical review, data management, import/export, and experimental features. Requires LSL stream integration, session persistence, patient metadata handling, regulatory traceability, and comprehensive state management across live and playback modes.
 
+## UI Requirements Implementation Status
+
+### UI-REQ-001 – Setup Workflow ✅
+**Implementation**: SetupTab.tsx with full electrode quality monitoring
+- Electrode quality per contact with color-coded status legend (OK/Warn/Error)
+- Patient metadata capture (ID, GA, weight) in PatientStrip global header
+- LSL stream status display with name, sampling rate, channels, packet loss, buffer level
+- Go/No-Go indicator based on preflight checklist completion
+- Refreshable impedance check with one-tap refresh button
+- Stepwise impedance wizard with ref/ground continuity checks
+- Status legend always visible with impedance thresholds
+
+### UI-REQ-002 – Review Workflow ✅
+**Implementation**: ReviewTab.tsx with synchronized views
+- Event list with seizure/artifact/note filtering
+- Stacked 8-channel timeline waveforms (TimelineEEG component)
+- Annotations with clinical notes textarea
+- Spectrogram/FFT panel with channel selector
+- Cursor-linked synchronized views
+- Transport controls (play/pause, seek ±10s, speed 0.5x-4x)
+- Seizure probability curve with adjustable threshold slider
+- Timestamp display and position tracking
+- All views synchronized during playback
+
+### UI-REQ-003 – Export/Audit ✅
+**Implementation**: ExportDialog.tsx component
+- Reviewer identity required field (cannot export without)
+- Timestamp automatically recorded
+- File integrity with SHA-256 checksum notation
+- Session metadata included in export
+- Audit log entry on every export action
+- Consent marker checkbox required for PHI exports
+- Export includes who/when/what/checksum details
+
+### UI-REQ-004 – Import Workflow 🔄
+**Implementation**: ImportTab.tsx (existing, enhanced validation needed)
+- Dataset/EDF ingest capability
+- Schema/label validation messaging
+- Checksum verification
+- Gap detection in imported data
+- Patient assignment workflow
+- Channel mapping helper
+- Post-import summary with counts/duration/gaps
+- Validation failure blocking and flagging
+
+### UI-REQ-005 – Comprehensive/Ops Center ✅
+**Implementation**: ComprehensiveTab.tsx with modular widgets
+- Multi-widget grid layout with 6 tabs (Live EEG, Impedance, Electrode Map, Accel, Analysis, Ops)
+- Live/playback mode toggle
+- Widget configuration and reorder capability
+- Saved layouts with useKV persistence
+- Marker management (add/clear/export)
+- Time window adjustment (1-30s)
+- LiveEEGStreamPanel with 60 FPS rendering
+
+### UI-REQ-006 – Innovation/Sandbox ✅
+**Implementation**: InnovationTab.tsx with feature flags
+- Experimental space with clear lab-only banner/alert
+- Feature flags to enable/disable (multi-patient grid, mobile monitoring, AI spike detection, A/B test)
+- Multi-patient grid prototype (MultiPatientGrid component)
+- Mobile monitoring cards with battery/connectivity status
+- Spike review queue integration
+- Isolated from production data with clear warnings
+- Prototype notes logging
+
+### UI-REQ-007 – Neonatal aEEG 🔄
+**Status**: Planned for future implementation
+- Dual view (aEEG + raw EEG) layout
+- Preset NICU layouts
+- Alarm limits for neonatal thresholds
+- Simplified nurse mode
+
+### UI-REQ-008 – Guided Impedance Wizard ✅
+**Implementation**: SetupTab.tsx electrode section
+- Stepwise per-electrode troubleshooting display
+- Go/No-Go banner based on preflight checks
+- Ref/ground continuity check prompts
+- One-tap refresh impedance button
+- Status legend with color coding (OK < 5kΩ, Warn 5-10kΩ, Error > 10kΩ)
+- Always visible status indicators
+
+### UI-REQ-009 – AI-Assisted Spike/Seizure Queue ✅
+**Implementation**: SpikeSeizureQueue.tsx component
+- Ranked events with confidence percentage display
+- Admit/reject workflow for each event
+- Jump-to-time functionality
+- Batch actions (admit/reject multiple events)
+- Provenance tag showing algorithm version (v2.3.1)
+- Pending/admitted/rejected status tracking
+- Channel and timestamp information per event
+
+### UI-REQ-010 – Multi-Patient Monitoring Grid ✅
+**Implementation**: MultiPatientGrid.tsx component
+- Per-card status pills (stream health, battery, connectivity)
+- Mini trend sparkline placeholders
+- Seizure probability bar with color coding
+- Drill-down to full view via button
+- Supports 4-16 beds display
+- Filter/sort by acuity (high/medium/low)
+- Real-time status updates with last-update timestamp
+- Responsive grid layout (2-4 columns based on screen size)
+
+### UI-REQ-011 – Mobile/Remote Review 🔄
+**Status**: Partially implemented (responsive design present)
+- Low-bandwidth waveform rendering capability exists
+- Annotation sync via useKV
+- Read-only mode indicators
+- Responsive layout throughout application
+- Offline cache with sync (needs implementation)
+- Security banner for remote use (needs implementation)
+
+### UI-REQ-012 – Modular Workspace ✅
+**Implementation**: ComprehensiveTab.tsx
+- Plugin-style widgets (EEG, spectrogram, FFT, impedance, accelerometer, maps)
+- Tab-based widget organization (6 widget types)
+- Per-user saved presets via useKV('comprehensive-layout')
+- Quick "reset to default" layout button
+- Layout save functionality with toast confirmation
+
+### UI-REQ-013 – Clinical Filter Presets ✅
+**Implementation**: ClinicalFilterPresets.tsx component
+- One-click presets: NICU artifact reduction, neonatal bands, low/high-pass defaults
+- Clear indicator of active filters (badge display)
+- Keyboard shortcut documentation (Ctrl+1-4)
+- Custom filter sliders (low-pass 0.1-5 Hz, high-pass 10-200 Hz)
+- 50/60Hz notch filter toggle
+- Preset vs. Custom indicator
+- Real-time filter value display
+
+### UI-REQ-014 – Recording Safety Controls ✅
+**Implementation**: SetupTab.tsx preflight section
+- Preflight checklist with 5 items: electrodes verified, cap size OK, LSL locked, license running, storage path valid
+- Live loss-of-signal watchdog status indicator
+- Automatic re-link prompts via toast notifications
+- Buffer overrun indicator in quick stats (buffer % with warning at >80%)
+- Stop on unrecoverable loss with toast/log capability
+- All checks must pass for Go status before monitoring starts
+
+### UI-REQ-015 – Secure Export/Import Guardrails ✅
+**Implementation**: ExportDialog.tsx
+- Consent marker required checkbox for PHI exports (blocks export if unchecked)
+- PHI minimization toggle (de-identify fields option)
+- Audit stamp on every export (reviewer, timestamp, checksum, format)
+- Warning on external paths (validation for /exports/ or /data/ directories)
+- Success/fail message with checksum noted in toast
+- Export format selection (CSV, EDF, JSON)
+- Full metadata panel with integrity check indicators
+
 ## Essential Features
 
 ### Real-Time LSL Stream Setup

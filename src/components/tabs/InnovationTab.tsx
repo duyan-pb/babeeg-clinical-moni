@@ -1,60 +1,114 @@
+import { useState } from 'react'
+import { useKV } from '@github/spark/hooks'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
-import { FolderOpen, Bell, ArrowClockwise } from '@phosphor-icons/react'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Bell, ArrowClockwise, Flask } from '@phosphor-icons/react'
+import { MultiPatientGrid } from '@/components/monitoring/MultiPatientGrid'
+import { toast } from 'sonner'
+
+interface FeatureFlags {
+  multiPatientGrid: boolean
+  mobileMonitoring: boolean
+  aiSpikeDetection: boolean
+  abTest: boolean
+}
 
 export function InnovationTab() {
+  const [featureFlags, setFeatureFlags] = useKV<FeatureFlags>('innovation-feature-flags', {
+    multiPatientGrid: true,
+    mobileMonitoring: false,
+    aiSpikeDetection: true,
+    abTest: false
+  })
+
+  const flags = featureFlags || {
+    multiPatientGrid: true,
+    mobileMonitoring: false,
+    aiSpikeDetection: true,
+    abTest: false
+  }
+
+  const toggleFlag = (flag: keyof FeatureFlags) => {
+    const currentFlags = featureFlags || flags
+    setFeatureFlags((current) => ({
+      ...(current || flags),
+      [flag]: !currentFlags[flag]
+    }))
+    toast.info(`Feature ${flag} ${!currentFlags[flag] ? 'enabled' : 'disabled'}`)
+  }
+
   return (
     <div className="space-y-6 p-6">
-      <div className="rounded-lg border border-amber-500 bg-amber-50 p-4 dark:bg-amber-950">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <Badge variant="outline" className="border-amber-600 text-amber-600">Lab-only</Badge>
-            <span className="text-sm text-amber-900 dark:text-amber-100">No patient PHI</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2">
-              <Switch id="ab-test" />
-              <Label htmlFor="ab-test" className="text-sm">Enable A/B test</Label>
+      <Alert className="border-[oklch(0.70_0.18_75)] bg-[oklch(0.70_0.18_75)]/10">
+        <Flask className="h-4 w-4" />
+        <AlertDescription>
+          <strong>LAB-ONLY / SANDBOX:</strong> Experimental features isolated from production data. No patient PHI in this environment.
+        </AlertDescription>
+      </Alert>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Feature Flags</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="flex items-center justify-between rounded border border-border p-3">
+              <Label htmlFor="multi-patient-flag" className="text-sm">Multi-Patient Grid</Label>
+              <Switch 
+                id="multi-patient-flag"
+                checked={flags.multiPatientGrid}
+                onCheckedChange={() => toggleFlag('multiPatientGrid')}
+              />
             </div>
+            <div className="flex items-center justify-between rounded border border-border p-3">
+              <Label htmlFor="mobile-flag" className="text-sm">Mobile Monitoring</Label>
+              <Switch 
+                id="mobile-flag"
+                checked={flags.mobileMonitoring}
+                onCheckedChange={() => toggleFlag('mobileMonitoring')}
+              />
+            </div>
+            <div className="flex items-center justify-between rounded border border-border p-3">
+              <Label htmlFor="ai-spike-flag" className="text-sm">AI Spike Detection</Label>
+              <Switch 
+                id="ai-spike-flag"
+                checked={flags.aiSpikeDetection}
+                onCheckedChange={() => toggleFlag('aiSpikeDetection')}
+              />
+            </div>
+            <div className="flex items-center justify-between rounded border border-border p-3">
+              <Label htmlFor="ab-test-flag" className="text-sm">A/B Testing Mode</Label>
+              <Switch 
+                id="ab-test-flag"
+                checked={flags.abTest}
+                onCheckedChange={() => toggleFlag('abTest')}
+              />
+            </div>
+          </div>
+          <div className="mt-4 flex gap-2">
             <Button variant="outline" size="sm">Back to stable</Button>
             <Button variant="outline" size="sm">Export prototype log</Button>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      {flags.multiPatientGrid && (
         <Card>
           <CardHeader>
             <CardTitle>Multi-Patient Grid (Persyst-style prototype)</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {[1, 2, 3, 4, 5, 6].map((bed) => (
-                <div key={bed} className="rounded-lg border border-border p-4">
-                  <div className="mb-2 font-semibold">Bed {bed}</div>
-                  <div className="mb-3 h-16 rounded border border-border bg-muted/20 p-2">
-                    <div className="text-xs text-muted-foreground">Trend mini</div>
-                  </div>
-                  <div className="mb-3 h-12 rounded border border-border bg-muted/20 p-2">
-                    <div className="text-xs text-muted-foreground">Seiz prob sparkline</div>
-                  </div>
-                  <div className="flex gap-1">
-                    <Button variant="outline" size="sm" className="flex-1">
-                      <FolderOpen className="h-3 w-3" />
-                    </Button>
-                    <Button variant="outline" size="sm" className="flex-1">Pin</Button>
-                    <Button variant="outline" size="sm" className="flex-1">Remove</Button>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <MultiPatientGrid />
           </CardContent>
         </Card>
+      )}
 
+      {flags.mobileMonitoring && (
         <Card>
           <CardHeader>
             <CardTitle>Mobile Monitoring Cards (planned)</CardTitle>
@@ -121,37 +175,7 @@ export function InnovationTab() {
             </div>
           </CardContent>
         </Card>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Spike Review / Ops (pilot)</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-4 lg:grid-cols-3">
-            <div className="rounded border border-border p-4">
-              <div className="mb-2 text-sm font-medium">Spike Queue</div>
-              <div className="h-32 rounded border border-border bg-muted/20 p-2">
-                <div className="text-xs text-muted-foreground">Pending spike events</div>
-              </div>
-            </div>
-            <div className="rounded border border-border p-4">
-              <div className="mb-2 text-sm font-medium">Band Power Panels</div>
-              <div className="h-32 rounded border border-border bg-muted/20 p-2">
-                <div className="text-xs text-muted-foreground">Theta/Alpha/Beta</div>
-              </div>
-            </div>
-            <div className="rounded border border-border p-4">
-              <div className="mb-2 text-sm font-medium">Actions</div>
-              <div className="space-y-2">
-                <Button variant="outline" size="sm" className="w-full">Admit to trend view</Button>
-                <Button variant="outline" size="sm" className="w-full">Reject</Button>
-                <Button variant="outline" size="sm" className="w-full">Export findings</Button>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      )}
 
       <Card>
         <CardHeader>

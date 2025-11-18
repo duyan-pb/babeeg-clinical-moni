@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -6,11 +7,23 @@ import { Badge } from '@/components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ArrowClockwise, Download, FolderOpen, Archive, Trash } from '@phosphor-icons/react'
+import { ExportDialog } from '@/components/export/ExportDialog'
 import type { Session } from '@/types'
 
 export function DataTab() {
   const [sessions] = useKV<Session[]>('eeg-sessions', [])
+  const [selectedSession, setSelectedSession] = useState<Session | null>(null)
+  const [exportDialogOpen, setExportDialogOpen] = useState(false)
   const sessionList = sessions || []
+
+  const handleSelectSession = (session: Session) => {
+    setSelectedSession(session)
+  }
+
+  const handleExport = (session: Session) => {
+    setSelectedSession(session)
+    setExportDialogOpen(true)
+  }
 
   return (
     <div className="space-y-4 p-6">
@@ -67,7 +80,11 @@ export function DataTab() {
                   </TableHeader>
                   <TableBody>
                     {sessionList.map((session) => (
-                      <TableRow key={session.id}>
+                      <TableRow 
+                        key={session.id}
+                        className="cursor-pointer hover:bg-muted/50"
+                        onClick={() => handleSelectSession(session)}
+                      >
                         <TableCell className="text-xs">{session.startTime}</TableCell>
                         <TableCell className="text-xs font-medium">{session.patientId}</TableCell>
                         <TableCell className="text-xs">{session.duration} min</TableCell>
@@ -86,11 +103,15 @@ export function DataTab() {
                         </TableCell>
                         <TableCell className="text-xs">{session.location}</TableCell>
                         <TableCell>
-                          <div className="flex gap-1">
+                          <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
                             <Button variant="ghost" size="sm">
                               <FolderOpen className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="sm">
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => handleExport(session)}
+                            >
                               <Download className="h-4 w-4" />
                             </Button>
                             <Button variant="ghost" size="sm">
@@ -167,7 +188,15 @@ export function DataTab() {
               <CardTitle>Export Actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              <Button variant="outline" size="sm" className="w-full">Export CSV</Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full"
+                onClick={() => selectedSession && handleExport(selectedSession)}
+                disabled={!selectedSession}
+              >
+                Export CSV
+              </Button>
               <Button variant="outline" size="sm" className="w-full">Export EDF (pending)</Button>
               <Button variant="outline" size="sm" className="w-full">Bulk archive</Button>
               <Button variant="outline" size="sm" className="w-full">Audit Trail</Button>
@@ -175,6 +204,12 @@ export function DataTab() {
           </Card>
         </div>
       </div>
+
+      <ExportDialog 
+        open={exportDialogOpen}
+        onOpenChange={setExportDialogOpen}
+        sessionId={selectedSession?.id}
+      />
     </div>
   )
 }

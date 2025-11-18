@@ -1,0 +1,1 @@
+export { MultiPatientGrid } from './MultiPatientGrid'
