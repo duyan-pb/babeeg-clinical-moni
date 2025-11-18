@@ -15,23 +15,6 @@ interface PatientData {
 }
 
 export function GlobalHeader() {
-  return (
-    <div className="border-b border-border bg-card">
-      <div className="flex items-center justify-between px-6 py-3">
-        <div className="flex items-center gap-8">
-          <h1 className="text-xl font-semibold tracking-tight">BabEEG</h1>
-        </div>
-        <div className="flex items-center gap-4 text-xs text-muted-foreground">
-          <span>LSL: Disconnected</span>
-          <span>License: Active</span>
-          <span>SBOM</span>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-export function PatientStrip() {
   const [patientData, setPatientData] = useKV<PatientData>('patient-data', {
     mrn: '',
     ga: '',
@@ -56,66 +39,80 @@ export function PatientStrip() {
   }
 
   return (
-    <div className="border-b border-border bg-muted/30 px-6 py-2">
-      <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs">
-        <div className="flex items-center gap-2">
-          <span className="text-muted-foreground">Patient:</span>
-          <span className="font-medium">Neo-##</span>
+    <div className="border-b border-border bg-card">
+      <div className="flex flex-col gap-2 px-6 py-3">
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-semibold tracking-tight">BabEEG</h1>
+          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+            <span>LSL: Disconnected</span>
+            <span>License: Active</span>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-muted-foreground">MRN:</span>
-          <input 
-            type="text" 
-            className="h-6 w-24 rounded border border-input bg-background px-2 text-xs"
-            placeholder="Enter MRN"
-            value={data.mrn}
-            onChange={(e) => handleUpdate('mrn', e.target.value)}
-          />
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-muted-foreground">GA:</span>
-          <input 
-            type="text" 
-            className="h-6 w-16 rounded border border-input bg-background px-2 text-xs"
-            placeholder="weeks"
-            value={data.ga}
-            onChange={(e) => handleUpdate('ga', e.target.value)}
-          />
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-muted-foreground">Weight:</span>
-          <input 
-            type="text" 
-            className="h-6 w-20 rounded border border-input bg-background px-2 text-xs"
-            placeholder="grams"
-            value={data.weight}
-            onChange={(e) => handleUpdate('weight', e.target.value)}
-          />
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-muted-foreground">Clinician:</span>
-          <input 
-            type="text" 
-            className="h-6 w-28 rounded border border-input bg-background px-2 text-xs"
-            placeholder="Dr."
-            value={data.clinician}
-            onChange={(e) => handleUpdate('clinician', e.target.value)}
-          />
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-muted-foreground">Shift:</span>
-          <select 
-            className="h-6 rounded border border-input bg-background px-2 text-xs"
-            value={data.shift}
-            onChange={(e) => handleUpdate('shift', e.target.value as 'Day' | 'Night')}
-          >
-            <option>Day</option>
-            <option>Night</option>
-          </select>
+        
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
+          <div className="flex items-center gap-2">
+            <span className="text-muted-foreground">Patient:</span>
+            <span className="font-medium">Neo-##</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-muted-foreground">MRN:</span>
+            <input 
+              type="text" 
+              className="h-6 w-24 rounded border border-input bg-background px-2 text-xs"
+              placeholder="Enter MRN"
+              value={data.mrn}
+              onChange={(e) => handleUpdate('mrn', e.target.value)}
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-muted-foreground">GA:</span>
+            <input 
+              type="text" 
+              className="h-6 w-16 rounded border border-input bg-background px-2 text-xs"
+              placeholder="weeks"
+              value={data.ga}
+              onChange={(e) => handleUpdate('ga', e.target.value)}
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-muted-foreground">Weight:</span>
+            <input 
+              type="text" 
+              className="h-6 w-20 rounded border border-input bg-background px-2 text-xs"
+              placeholder="grams"
+              value={data.weight}
+              onChange={(e) => handleUpdate('weight', e.target.value)}
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-muted-foreground">Clinician:</span>
+            <input 
+              type="text" 
+              className="h-6 w-28 rounded border border-input bg-background px-2 text-xs"
+              placeholder="Dr."
+              value={data.clinician}
+              onChange={(e) => handleUpdate('clinician', e.target.value)}
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-muted-foreground">Shift:</span>
+            <select 
+              className="h-6 rounded border border-input bg-background px-2 text-xs"
+              value={data.shift}
+              onChange={(e) => handleUpdate('shift', e.target.value as 'Day' | 'Night')}
+            >
+              <option>Day</option>
+              <option>Night</option>
+            </select>
+          </div>
         </div>
       </div>
     </div>
   )
+}
+
+export function PatientStrip() {
+  return null
 }
 
 export function SafetyStrip() {
