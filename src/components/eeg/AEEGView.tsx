@@ -64,46 +64,55 @@ export function AEEGView() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="h-64 rounded border border-border bg-gradient-to-b from-muted/20 to-background p-4">
-                <div className="flex h-full flex-col justify-between text-xs text-muted-foreground">
-                  <div className="flex items-center justify-between">
-                    <span>100 µV</span>
-                    <div className="flex-1 border-t border-dashed border-destructive/30 mx-2" />
-                    <span className="text-destructive text-[10px]">Upper Margin</span>
-                  </div>
-                  <div className="text-center">
-                    <div className="mb-1 font-medium text-foreground">Trend envelope visualization</div>
-                    <div className="text-[10px]">Min/Max amplitude over time with background pattern classification</div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span>5 µV</span>
-                    <div className="flex-1 border-t border-dashed border-destructive/30 mx-2" />
-                    <span className="text-destructive text-[10px]">Lower Margin</span>
+              <div className="max-h-[300px] overflow-y-auto">
+                <div className="h-64 rounded border border-border bg-gradient-to-b from-muted/20 to-background p-4">
+                  <div className="flex h-full flex-col justify-between text-xs text-muted-foreground">
+                    <div className="flex items-center justify-between">
+                      <span>100 µV</span>
+                      <div className="flex-1 border-t border-dashed border-destructive/30 mx-2" />
+                      <span className="text-destructive text-[10px]">Upper Margin</span>
+                    </div>
+                    <div className="text-center">
+                      <div className="mb-1 font-medium text-foreground">Trend envelope visualization</div>
+                      <div className="text-[10px]">Min/Max amplitude over time with background pattern classification</div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>5 µV</span>
+                      <div className="flex-1 border-t border-dashed border-destructive/30 mx-2" />
+                      <span className="text-destructive text-[10px]">Lower Margin</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
-                <span>6hr ago</span>
-                <Badge variant="secondary" className="text-xs">Continuous</Badge>
-                <span>Now</span>
+                <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
+                  <span>6hr ago</span>
+                  <Badge variant="secondary" className="text-xs">Continuous</Badge>
+                  <span>Now</span>
+                </div>
               </div>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Raw EEG (2-Channel)</CardTitle>
+              <CardTitle className="text-base">Raw EEG (Multi-Channel)</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                <div className="h-24 rounded border border-border bg-muted/20 p-3">
-                  <div className="mb-1 text-xs font-medium">Channel 1 (F3-P3)</div>
-                  <div className="text-[10px] text-muted-foreground">10-second epoch with real-time waveform</div>
-                </div>
-                <div className="h-24 rounded border border-border bg-muted/20 p-3">
-                  <div className="mb-1 text-xs font-medium">Channel 2 (F4-P4)</div>
-                  <div className="text-[10px] text-muted-foreground">10-second epoch with real-time waveform</div>
-                </div>
+              <div className="max-h-[400px] space-y-3 overflow-y-auto pr-2">
+                {[
+                  { name: 'F3-P3', id: 'ch1' },
+                  { name: 'F4-P4', id: 'ch2' },
+                  { name: 'C3-O1', id: 'ch3' },
+                  { name: 'C4-O2', id: 'ch4' },
+                  { name: 'T3-T5', id: 'ch5' },
+                  { name: 'T4-T6', id: 'ch6' },
+                  { name: 'Fp1-C3', id: 'ch7' },
+                  { name: 'Fp2-C4', id: 'ch8' },
+                ].map((channel) => (
+                  <div key={channel.id} className="h-24 rounded border border-border bg-muted/20 p-3">
+                    <div className="mb-1 text-xs font-medium">{channel.name}</div>
+                    <div className="text-[10px] text-muted-foreground">10-second epoch with real-time waveform</div>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>

@@ -476,27 +476,45 @@ export function SetupTab() {
           <CardTitle>Signal Quality Preview</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Channel Fp1</span>
-                <Badge variant="outline" className="bg-[oklch(0.60_0.15_145)]">Good</Badge>
-              </div>
-              <MiniWaveform quality="good" />
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Channel F3</span>
-                <Badge variant="outline" className="bg-[oklch(0.70_0.18_75)]">Fair</Badge>
-              </div>
-              <MiniWaveform quality="fair" />
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Channel T4</span>
-                <Badge variant="outline" className="bg-[oklch(0.55_0.22_25)]">Poor</Badge>
-              </div>
-              <MiniWaveform quality="poor" />
+          <div className="max-h-[600px] overflow-y-auto pr-2">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {[
+                { name: 'Fp1', quality: 'good' as const },
+                { name: 'Fp2', quality: 'good' as const },
+                { name: 'F3', quality: 'fair' as const },
+                { name: 'F4', quality: 'good' as const },
+                { name: 'C3', quality: 'good' as const },
+                { name: 'C4', quality: 'good' as const },
+                { name: 'Cz', quality: 'fair' as const },
+                { name: 'P3', quality: 'good' as const },
+                { name: 'P4', quality: 'good' as const },
+                { name: 'O1', quality: 'good' as const },
+                { name: 'O2', quality: 'fair' as const },
+                { name: 'T3', quality: 'poor' as const },
+                { name: 'T4', quality: 'good' as const },
+                { name: 'Pz', quality: 'good' as const },
+                { name: 'Oz', quality: 'fair' as const },
+                { name: 'Fz', quality: 'good' as const },
+              ].slice(0, selectedStream ? 32 : 3).map((channel) => (
+                <div key={channel.name} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">Channel {channel.name}</span>
+                    <Badge 
+                      variant="outline" 
+                      className={
+                        channel.quality === 'good' 
+                          ? 'bg-[oklch(0.60_0.15_145)] text-white'
+                          : channel.quality === 'fair'
+                          ? 'bg-[oklch(0.70_0.18_75)] text-white'
+                          : 'bg-[oklch(0.55_0.22_25)] text-white'
+                      }
+                    >
+                      {channel.quality === 'good' ? 'Good' : channel.quality === 'fair' ? 'Fair' : 'Poor'}
+                    </Badge>
+                  </div>
+                  <MiniWaveform quality={channel.quality} />
+                </div>
+              ))}
             </div>
           </div>
         </CardContent>

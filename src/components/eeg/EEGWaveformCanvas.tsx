@@ -200,8 +200,11 @@ export function EEGWaveformCanvas({
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
+  const minChannelHeight = 80
+  const calculatedHeight = Math.max(enabledChannels.length * minChannelHeight, 400)
+
   return (
-    <div className="relative h-full w-full">
+    <div className="relative w-full" style={{ height: `${calculatedHeight}px`, minHeight: '100%' }}>
       <canvas
         ref={canvasRef}
         className="h-full w-full"

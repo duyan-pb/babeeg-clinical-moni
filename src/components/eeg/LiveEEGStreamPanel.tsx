@@ -74,7 +74,7 @@ export function LiveEEGStreamPanel({
   const enabledCount = activeChannels.filter(ch => ch.enabled).length
 
   return (
-    <div className="relative flex h-full w-full flex-col">
+    <div className="relative flex h-full w-full flex-col overflow-hidden">
       <div className="absolute left-4 top-4 z-10 flex items-center gap-2">
         <Badge variant="outline" className="bg-background/95 backdrop-blur">
           {enabledCount} / {activeChannels.length} channels
@@ -189,7 +189,7 @@ export function LiveEEGStreamPanel({
         </Popover>
       </div>
 
-      <div className="flex-1">
+      <div className="flex-1 overflow-auto">
         <EEGWaveformCanvas
           timeWindow={timeWindow}
           channels={activeChannels}

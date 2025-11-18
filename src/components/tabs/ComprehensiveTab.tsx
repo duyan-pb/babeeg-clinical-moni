@@ -160,8 +160,8 @@ export function ComprehensiveTab() {
         </TabsList>
 
         <TabsContent value="live-eeg" className="space-y-4">
-          <Card>
-            <CardHeader>
+          <Card className="flex flex-col">
+            <CardHeader className="flex-shrink-0">
               <div className="flex items-center justify-between">
                 <CardTitle>{mode === 'live' ? 'Live EEG Stream' : 'Playback'}</CardTitle>
                 {mode === 'live' && (
@@ -180,8 +180,8 @@ export function ComprehensiveTab() {
                 )}
               </div>
             </CardHeader>
-            <CardContent className="overflow-hidden">
-              <div className="h-96 w-full">
+            <CardContent className="flex-1 overflow-hidden p-0">
+              <div className="h-[600px] w-full overflow-auto">
                 <LiveEEGStreamPanel 
                   timeWindow={timeWindow}
                   isLive={mode === 'live'}
