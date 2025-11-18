@@ -6,6 +6,7 @@ import { Progress } from '@/components/ui/progress'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { ArrowClockwise, CheckCircle, Warning, XCircle } from '@phosphor-icons/react'
 import { toast } from 'sonner'
+import headOutline from '@/assets/images/head-outline.svg'
 
 export interface ElectrodeImpedance {
   id: string
@@ -191,99 +192,70 @@ export function ImpedanceChecker() {
         <div className="grid gap-6 lg:grid-cols-2">
           <div className="space-y-3">
             <h3 className="text-sm font-medium">Scalp Electrode Map</h3>
-            <div className="relative mx-auto aspect-square w-full max-w-sm rounded-lg border border-border bg-muted/20 p-4">
-              <svg
-                viewBox="0 0 100 100"
-                className="h-full w-full"
-                style={{ filter: 'drop-shadow(0 1px 2px rgb(0 0 0 / 0.1))' }}
-              >
-                <ellipse
-                  cx="50"
-                  cy="52"
-                  rx="38"
-                  ry="42"
-                  fill="none"
-                  stroke="oklch(0.70 0 0)"
-                  strokeWidth="0.5"
-                  strokeDasharray="2 1"
+            <div className="relative mx-auto aspect-[4/5] w-full max-w-sm rounded-lg border border-border bg-muted/20 p-4">
+              <div className="relative h-full w-full">
+                <img 
+                  src={headOutline} 
+                  alt="Head outline" 
+                  className="absolute inset-0 h-full w-full object-contain opacity-60"
                 />
-                
-                <path
-                  d="M 50 10 Q 46 5, 50 2 Q 54 5, 50 10"
-                  fill="none"
-                  stroke="oklch(0.70 0 0)"
-                  strokeWidth="0.5"
-                />
-                
-                <ellipse
-                  cx="20"
-                  cy="50"
-                  rx="3"
-                  ry="5"
-                  fill="oklch(0.96 0 0)"
-                  stroke="oklch(0.70 0 0)"
-                  strokeWidth="0.5"
-                />
-                <ellipse
-                  cx="80"
-                  cy="50"
-                  rx="3"
-                  ry="5"
-                  fill="oklch(0.96 0 0)"
-                  stroke="oklch(0.70 0 0)"
-                  strokeWidth="0.5"
-                />
+                <svg
+                  viewBox="0 0 100 125"
+                  className="relative h-full w-full"
+                  style={{ filter: 'drop-shadow(0 1px 2px rgb(0 0 0 / 0.1))' }}
+                >
+                  {scalpElectrodes.map(electrode => {
+                    if (!electrode.x || !electrode.y) return null
+                    
+                    const isHovered = hoveredElectrode === electrode.id
+                    const radius = isHovered ? 4.5 : 3.5
+                    const adjustedY = electrode.y * 1.1 + 5
 
-                {scalpElectrodes.map(electrode => {
-                  if (!electrode.x || !electrode.y) return null
-                  
-                  const isHovered = hoveredElectrode === electrode.id
-                  const radius = isHovered ? 4.5 : 3.5
-
-                  return (
-                    <g key={electrode.id}>
-                      <circle
-                        cx={electrode.x}
-                        cy={electrode.y}
-                        r={radius}
-                        fill={getStatusColor(electrode.status)}
-                        stroke="white"
-                        strokeWidth="1.2"
-                        className="cursor-pointer transition-all"
-                        onMouseEnter={() => setHoveredElectrode(electrode.id)}
-                        onMouseLeave={() => setHoveredElectrode(null)}
-                      />
-                      {electrode.status === 'checking' && (
+                    return (
+                      <g key={electrode.id}>
                         <circle
                           cx={electrode.x}
-                          cy={electrode.y}
-                          r={radius + 2}
-                          fill="none"
-                          stroke={getStatusColor('checking')}
-                          strokeWidth="0.8"
-                          opacity="0.6"
-                          className="animate-ping"
+                          cy={adjustedY}
+                          r={radius}
+                          fill={getStatusColor(electrode.status)}
+                          stroke="white"
+                          strokeWidth="1.2"
+                          className="cursor-pointer transition-all"
+                          onMouseEnter={() => setHoveredElectrode(electrode.id)}
+                          onMouseLeave={() => setHoveredElectrode(null)}
                         />
-                      )}
-                      <text
-                        x={electrode.x}
-                        y={electrode.y - 6}
-                        textAnchor="middle"
-                        fontSize="3"
-                        fontWeight={isHovered ? 'bold' : 'normal'}
-                        fill="oklch(0.20 0 0)"
-                        className="pointer-events-none select-none transition-all"
-                        style={{ 
-                          fontFamily: 'Inter, sans-serif',
-                          fontSize: isHovered ? '3.5px' : '3px'
-                        }}
-                      >
-                        {electrode.label}
-                      </text>
-                    </g>
-                  )
-                })}
-              </svg>
+                        {electrode.status === 'checking' && (
+                          <circle
+                            cx={electrode.x}
+                            cy={adjustedY}
+                            r={radius + 2}
+                            fill="none"
+                            stroke={getStatusColor('checking')}
+                            strokeWidth="0.8"
+                            opacity="0.6"
+                            className="animate-ping"
+                          />
+                        )}
+                        <text
+                          x={electrode.x}
+                          y={adjustedY - 6}
+                          textAnchor="middle"
+                          fontSize="3"
+                          fontWeight={isHovered ? 'bold' : 'normal'}
+                          fill="oklch(0.20 0 0)"
+                          className="pointer-events-none select-none transition-all"
+                          style={{ 
+                            fontFamily: 'Inter, sans-serif',
+                            fontSize: isHovered ? '3.5px' : '3px'
+                          }}
+                        >
+                          {electrode.label}
+                        </text>
+                      </g>
+                    )
+                  })}
+                </svg>
+              </div>
             </div>
 
             {hoveredElectrode && (
