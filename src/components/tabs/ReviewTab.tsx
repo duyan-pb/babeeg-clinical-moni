@@ -3,42 +3,30 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
-import { Slider } from '@/components/ui/slider'
-import { Play, Pause, FastForward, Rewind, Download } from '@phosphor-icons/react'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
-import { TimelineEEG } from '@/components/eeg/TimelineEEG'
-import { SpikeSeizureQueue } from '@/components/review/SpikeSeizureQueue'
+import { Switch } from '@/components/ui/switch'
+import { Label } from '@/components/ui/label'
+import { LiveEEGStreamPanel } from '@/components/eeg/LiveEEGStreamPanel'
+import { EnhancedPlaybackControls } from '@/components/eeg/EnhancedPlaybackControls'
+import { AccelerometerStream } from '@/components/eeg/AccelerometerStream'
+import { FrequencyDomainAnalyzer } from '@/components/eeg/FrequencyDomainAnalyzer'
+import { Spectrogram } from '@/components/eeg/Spectrogram'
+import { ImpedanceChecker } from '@/components/eeg/ImpedanceChecker'
+import { ElectrodeScalpMap } from '@/components/eeg/ElectrodeScalpMap'
 import { ExportDialog } from '@/components/export/ExportDialog'
 import { toast } from 'sonner'
+import { usePlaybackEngine } from '@/components/eeg/PlaybackEngine'
 
 export function ReviewTab() {
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [playbackSpeed, setPlaybackSpeed] = useState('1x')
-  const [currentTime, setCurrentTime] = useState(0)
+  const { playbackState, setMode } = usePlaybackEngine('review-session')
   const [exportDialogOpen, setExportDialogOpen] = useState(false)
   const [selectedInterval, setSelectedInterval] = useState('30m')
   const [selectedEventType, setSelectedEventType] = useState('seizure')
   const [selectedArtifact, setSelectedArtifact] = useState('hide')
   const [selectedMontage, setSelectedMontage] = useState('10-20')
   const [annotation, setAnnotation] = useState('')
-  
-  const sampleEvents = [
-    { time: 450, type: 'seizure' as const, label: 'Seizure Event' },
-    { time: 890, type: 'seizure' as const, label: 'Possible Seizure' },
-    { time: 1200, type: 'artifact' as const, label: 'Motion Artifact' },
-  ]
-
-  const handlePlayPause = () => {
-    setIsPlaying(!isPlaying)
-    toast.info(isPlaying ? 'Playback paused' : 'Playback started')
-  }
-
-  const handleSeek = (delta: number) => {
-    setCurrentTime((prev) => Math.max(0, prev + delta))
-    toast.info(`Seeked ${delta > 0 ? '+' : ''}${delta}s`)
-  }
+  const [timeWindow, setTimeWindow] = useState(10)
 
   const handleApplyFilters = () => {
     toast.success(`Applied filters: ${selectedInterval}, ${selectedEventType}, ${selectedMontage}`)
@@ -61,26 +49,34 @@ export function ReviewTab() {
     }
   }
 
-  const handleAttachToEvent = () => {
-    if (annotation.trim()) {
-      toast.success('Annotation attached to current event')
-      setAnnotation('')
-    } else {
-      toast.error('Please enter an annotation')
-    }
-  }
-
   const handleGoLive = () => {
+    setMode('live')
     toast.success('Switching to live mode')
   }
 
-  const handleSendToReviewQueue = () => {
-    toast.success('Current clip sent to review queue')
+  const handleModeToggle = (checked: boolean) => {
+    setMode(checked ? 'playback' : 'live')
+    toast.info(checked ? 'Switched to playback mode' : 'Switched to live mode')
   }
 
+  const isLive = playbackState.mode === 'live'
+
   return (
-    <div className="space-y-4 p-6">
+    <div className="flex h-[calc(100vh-200px)] flex-col gap-4 p-6">
       <div className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card p-4">
+        <div className="flex items-center gap-2">
+          <Switch
+            id="mode-toggle"
+            checked={playbackState.mode === 'playback'}
+            onCheckedChange={handleModeToggle}
+          />
+          <Label htmlFor="mode-toggle" className="text-sm font-medium">
+            {isLive ? 'Live Stream' : 'Playback Mode'}
+          </Label>
+        </div>
+        
+        <div className="h-6 w-px bg-border" />
+
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">Interval:</span>
           <Select value={selectedInterval} onValueChange={setSelectedInterval}>
@@ -109,18 +105,6 @@ export function ReviewTab() {
           </Select>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Artifact:</span>
-          <Select value={selectedArtifact} onValueChange={setSelectedArtifact}>
-            <SelectTrigger className="w-36">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="hide">Hide motion</SelectItem>
-              <SelectItem value="show">Show all</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">Montage:</span>
           <Select value={selectedMontage} onValueChange={setSelectedMontage}>
             <SelectTrigger className="w-32">
@@ -136,185 +120,97 @@ export function ReviewTab() {
         <Button variant="outline" size="sm" onClick={handleResetFilters}>Reset</Button>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[2fr_320px]">
-        <div className="space-y-4">
-          <Card>
+      <div className="flex min-h-0 flex-1 gap-4">
+        <div className="flex min-h-0 flex-1 flex-col gap-4">
+          <Card className="flex-[2] overflow-hidden">
             <CardHeader className="pb-3">
-              <CardTitle>Synchronized Timeline + Trends</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle>EEG Waveforms</CardTitle>
+                <Badge variant={isLive ? 'destructive' : 'outline'}>
+                  {isLive ? 'LIVE' : 'PLAYBACK'}
+                </Badge>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="rounded border border-border bg-background p-6">
-                <TimelineEEG 
-                  duration={1800}
-                  channels={['Fp1', 'Fp2', 'F3', 'F4', 'C3', 'C4', 'Cz', 'P3']}
-                  events={sampleEvents}
-                />
-              </div>
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <div className="text-sm font-medium">Accelerometer + Posture</div>
-                  <div className="h-28 rounded border border-border bg-muted/20 p-3">
-                    <div className="text-xs text-muted-foreground">XYZ axes with motion flags</div>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="text-sm font-medium">Seizure Probability</div>
-                  <div className="h-28 rounded border border-border bg-muted/20 p-3">
-                    <div className="text-xs text-muted-foreground">Real-time probability curve</div>
-                  </div>
-                </div>
-              </div>
-              <div className="space-y-1">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-muted-foreground">Alarm Threshold</span>
-                  <Badge variant="outline" className="text-xs">75%</Badge>
-                </div>
-                <Slider defaultValue={[75]} max={100} step={1} className="w-full" />
-              </div>
+            <CardContent className="h-[calc(100%-60px)] p-0">
+              <LiveEEGStreamPanel timeWindow={timeWindow} isLive={isLive} />
             </CardContent>
           </Card>
 
-          <SpikeSeizureQueue />
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle>Annotations</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Textarea 
-                placeholder="Add clinical notes and observations..." 
-                rows={3}
-                value={annotation}
-                onChange={(e) => setAnnotation(e.target.value)}
-              />
-              <div className="flex gap-2">
-                <Button size="sm" onClick={handleSaveAnnotation}>Save Annotation</Button>
-                <Button variant="outline" size="sm" onClick={handleAttachToEvent}>Attach to Event</Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="space-y-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">Spectrogram</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Select>
-                <SelectTrigger className="h-9">
-                  <SelectValue placeholder="Select channel" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="fp1">Fp1</SelectItem>
-                  <SelectItem value="fp2">Fp2</SelectItem>
-                  <SelectItem value="cz">Cz</SelectItem>
-                </SelectContent>
-              </Select>
-              <div className="h-56 rounded border border-border bg-muted/20 p-3">
-                <div className="text-sm font-medium">Frequency (Y) vs Time (X)</div>
-                <div className="mt-1 text-xs text-muted-foreground">Power spectral density heatmap</div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">FFT / Band Power</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="h-28 rounded border border-border bg-muted/20 p-3">
-                <div className="text-xs text-muted-foreground">Delta, Theta, Alpha, Beta bands</div>
-              </div>
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <div className="rounded bg-muted/30 p-2">
-                  <div className="font-medium">Delta</div>
-                  <div className="text-muted-foreground">0.5-4 Hz</div>
-                </div>
-                <div className="rounded bg-muted/30 p-2">
-                  <div className="font-medium">Theta</div>
-                  <div className="text-muted-foreground">4-8 Hz</div>
-                </div>
-                <div className="rounded bg-muted/30 p-2">
-                  <div className="font-medium">Alpha</div>
-                  <div className="text-muted-foreground">8-13 Hz</div>
-                </div>
-                <div className="rounded bg-muted/30 p-2">
-                  <div className="font-medium">Beta</div>
-                  <div className="text-muted-foreground">13-30 Hz</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Transport Controls (Synchronized)</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap items-center gap-3">
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={handlePlayPause}
-            >
-              {isPlaying ? <Pause /> : <Play />}
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => handleSeek(-10)}
-            >
-              <Rewind />
-              -10s
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => handleSeek(10)}
-            >
-              +10s
-              <FastForward />
-            </Button>
-            <Select value={playbackSpeed} onValueChange={setPlaybackSpeed}>
-              <SelectTrigger className="w-24">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="0.5x">0.5x</SelectItem>
-                <SelectItem value="1x">1.0x</SelectItem>
-                <SelectItem value="2x">2.0x</SelectItem>
-                <SelectItem value="4x">4.0x</SelectItem>
-              </SelectContent>
-            </Select>
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-muted-foreground">Position:</span>
-              <span className="font-mono">{Math.floor(currentTime / 60)}:{(currentTime % 60).toString().padStart(2, '0')}</span>
+          {!isLive && (
+            <div className="flex-1">
+              <EnhancedPlaybackControls sessionId="review-session" />
             </div>
-            <Button variant="outline" size="sm" onClick={handleGoLive}>Go Live</Button>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => setExportDialogOpen(true)}
-            >
-              <Download className="mr-2 h-4 w-4" />
-              Export Clip
-            </Button>
-            <Button variant="outline" size="sm" onClick={handleSendToReviewQueue}>Send to Review Queue</Button>
-          </div>
-        </CardContent>
-      </Card>
+          )}
+        </div>
 
-      <div className="rounded border border-border bg-muted/20 px-4 py-2">
-        <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
-          <span>Source: <span className="font-medium">Playback</span></span>
-          <span>File: <span className="font-medium">session.csv</span></span>
-          <span>Integrity: <span className="font-medium text-[oklch(0.60_0.15_145)]">OK (SHA-256)</span></span>
-          <span>Consent: <span className="font-medium">on file</span></span>
-          <span>Reviewer: <span className="font-medium">Dr. Smith</span></span>
-          <span>Timestamp: <span className="font-medium">{new Date().toLocaleTimeString()}</span></span>
+        <div className="w-96">
+          <Tabs defaultValue="analysis" className="h-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="analysis">Analysis</TabsTrigger>
+              <TabsTrigger value="monitoring">Monitor</TabsTrigger>
+              <TabsTrigger value="notes">Notes</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="analysis" className="mt-4 space-y-4">
+              <Spectrogram channelId="Fp1" isLive={isLive} timeWindow={30} />
+              <FrequencyDomainAnalyzer channelId="Fp1" isLive={isLive} />
+            </TabsContent>
+
+            <TabsContent value="monitoring" className="mt-4 space-y-4">
+              <AccelerometerStream isLive={isLive} timeWindow={timeWindow} />
+              <ElectrodeScalpMap />
+              <ImpedanceChecker />
+            </TabsContent>
+
+            <TabsContent value="notes" className="mt-4 space-y-4">
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle>Annotations</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <Textarea 
+                    placeholder="Add clinical notes and observations..." 
+                    rows={8}
+                    value={annotation}
+                    onChange={(e) => setAnnotation(e.target.value)}
+                  />
+                  <Button size="sm" onClick={handleSaveAnnotation} className="w-full">
+                    Save Annotation
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle>Session Info</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Source:</span>
+                    <span className="font-medium">{isLive ? 'Live Stream' : 'session.csv'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Montage:</span>
+                    <span className="font-medium">{selectedMontage}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Integrity:</span>
+                    <Badge variant="outline" className="text-[oklch(0.60_0.15_145)]">
+                      OK
+                    </Badge>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="mt-4 w-full"
+                    onClick={() => setExportDialogOpen(true)}
+                  >
+                    Export Session
+                  </Button>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
 

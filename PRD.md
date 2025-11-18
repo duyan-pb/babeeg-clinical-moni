@@ -23,16 +23,22 @@ BabEEG is a Class B medical device UI for neonatal EEG monitoring that combines 
 - Status legend always visible with impedance thresholds
 
 ### UI-REQ-002 – Review Workflow ✅
-**Implementation**: ReviewTab.tsx with synchronized views
+**Implementation**: ReviewTab.tsx with synchronized views and enhanced playback
 - Event list with seizure/artifact/note filtering
-- Stacked 8-channel timeline waveforms (TimelineEEG component)
-- Annotations with clinical notes textarea
-- Spectrogram/FFT panel with channel selector
-- Cursor-linked synchronized views
-- Transport controls (play/pause, seek ±10s, speed 0.5x-4x)
-- Seizure probability curve with adjustable threshold slider
-- Timestamp display and position tracking
-- All views synchronized during playback
+- Live EEG stream with full 60 FPS multi-channel waveforms
+- Comprehensive playback controls with timeline scrubbing
+- Annotation markers with manual, trigger, artifact, and seizure types
+- Marker management (add, remove, jump to, export to CSV)
+- Live/playback mode toggle with synchronized state
+- Spectrogram with live and playback support (30s window)
+- Frequency domain analyzer with adjustable NFFT (128-2048 points)
+- Band power display (Delta, Theta, Alpha, Beta, Gamma)
+- Accelerometer live stream and playback with motion detection
+- Electrode impedance checker with reference and ground
+- Electrode/scalp mapping with 10-20 system visualization
+- Transport controls (play/pause, seek ±10s, speed 0.25x-4x, skip to start/end)
+- Timeline with marker overlays showing event positions
+- All views synchronized during playback with timestamp accuracy
 
 ### UI-REQ-003 – Export/Audit ✅
 **Implementation**: ExportDialog.tsx component
@@ -57,14 +63,20 @@ BabEEG is a Class B medical device UI for neonatal EEG monitoring that combines 
 - Progress tracking with cancellable import
 
 ### UI-REQ-005 – Comprehensive/Ops Center ✅
-**Implementation**: ComprehensiveTab.tsx with modular widgets
-- Multi-widget grid layout with 6 tabs (Live EEG, Impedance, Electrode Map, Accel, Analysis, Ops)
-- Live/playback mode toggle
-- Widget configuration and reorder capability
-- Saved layouts with useKV persistence
-- Marker management (add/clear/export)
-- Time window adjustment (1-30s)
+**Implementation**: ComprehensiveTab.tsx with modular widgets and enhanced analysis
+- Multi-widget grid layout with 7 tabs (Live EEG, aEEG, Impedance, Electrode Map, Accelerometer, Analysis, Ops)
+- Live/playback mode toggle with synchronized state
+- Widget configuration with integrated playback controls
+- Time window adjustment (1-30s) for all views
 - LiveEEGStreamPanel with 60 FPS rendering
+- Full impedance checking with reference and ground electrodes
+- Electrode scalp map with 10-20 system visualization
+- Accelerometer stream with XYZ axes and motion detection
+- Frequency domain analyzer with NFFT toggle (128-2048 points)
+- Spectrogram with live and playback support
+- Enhanced playback controls with marker support
+- Marker management fully integrated
+- All analysis tools support both live and playback modes
 
 ### UI-REQ-006 – Innovation/Sandbox ✅
 **Implementation**: InnovationTab.tsx with feature flags
@@ -350,3 +362,70 @@ Animations should be strictly functional—communicating state transitions, guid
 - Audit trail dialog with filterable log of all user actions, exports, and system events
 - Security banner for remote access scenarios with TLS encryption notice
 - aEEG view integrated into Comprehensive tab with nurse mode and NICU presets
+
+### New EEG Analysis Components (Iteration 2)
+
+#### PlaybackEngine Hook
+- Central playback state management with useKV persistence
+- Support for live and playback modes with smooth transitions
+- Playback speed control (0.25x-4x)
+- Timeline seeking and scrubbing
+- Marker system with multiple types (manual, trigger, artifact, seizure)
+- Source tracking (user, PsychoPy, software)
+- Export markers to CSV with full metadata
+
+#### ImpedanceChecker Component
+- Real-time impedance measurement for all electrodes
+- Reference and ground electrode monitoring
+- Color-coded status (OK < 5kΩ, Warn 5-10kΩ, Error > 10kΩ)
+- Animated checking sequence with per-electrode progress
+- Overall quality percentage display
+- Status legend with counts
+- Refresh on demand
+
+#### ElectrodeScalpMap Component
+- 10-20 system electrode positioning
+- Interactive SVG-based visualization
+- Head outline with anatomical landmarks (nasion, ears)
+- Color-coded electrode status matching impedance checker
+- Hover tooltips with electrode details
+- Real-time status updates
+
+#### AccelerometerStream Component
+- Live XYZ axis streaming with 100 Hz sampling
+- Real-time motion detection algorithm
+- Configurable time window (matches EEG)
+- Grid overlay toggle
+- Current value display for each axis
+- Motion detected badge with pulse animation
+- Canvas-based rendering for performance
+
+#### FrequencyDomainAnalyzer Component
+- FFT computation with adjustable NFFT (128-2048 points)
+- Frequency band power calculation (Delta, Theta, Alpha, Beta, Gamma)
+- Channel selection from all available electrodes
+- Bar chart visualization with band overlays
+- Real-time or playback mode support
+- Power spectral density display (µV²)
+- Frequency resolution control
+
+#### Spectrogram Component
+- Time-frequency heatmap visualization
+- 64 frequency bins (0-50 Hz)
+- 150 time slices for scrolling history
+- Color-mapped power scale
+- Live streaming with smooth animation
+- Channel selection
+- Frequency and time axis labels
+- Optimized canvas rendering
+
+#### EnhancedPlaybackControls Component
+- Comprehensive transport controls (play, pause, skip, seek)
+- Timeline slider with marker overlays
+- Speed control (0.25x-4x)
+- Marker dialog for adding annotations
+- Marker list with jump-to functionality
+- Export markers to CSV
+- Clear all markers
+- Time display with hour:minute:second format
+- Visual marker indicators on timeline
