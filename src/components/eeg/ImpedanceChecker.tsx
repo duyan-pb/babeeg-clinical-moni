@@ -13,6 +13,8 @@ export interface ElectrodeImpedance {
   value: number
   status: 'ok' | 'warn' | 'error' | 'checking'
   type: 'electrode' | 'reference' | 'ground'
+  x?: number
+  y?: number
 }
 
 const IMPEDANCE_THRESHOLDS = {
@@ -21,22 +23,24 @@ const IMPEDANCE_THRESHOLDS = {
 }
 
 const STANDARD_ELECTRODES = [
-  { id: 'fp1', label: 'Fp1', type: 'electrode' as const },
-  { id: 'fp2', label: 'Fp2', type: 'electrode' as const },
-  { id: 'f3', label: 'F3', type: 'electrode' as const },
-  { id: 'f4', label: 'F4', type: 'electrode' as const },
-  { id: 'c3', label: 'C3', type: 'electrode' as const },
-  { id: 'c4', label: 'C4', type: 'electrode' as const },
-  { id: 'cz', label: 'Cz', type: 'electrode' as const },
-  { id: 'p3', label: 'P3', type: 'electrode' as const },
-  { id: 'p4', label: 'P4', type: 'electrode' as const },
-  { id: 'o1', label: 'O1', type: 'electrode' as const },
-  { id: 'o2', label: 'O2', type: 'electrode' as const },
-  { id: 't3', label: 'T3', type: 'electrode' as const },
-  { id: 't4', label: 'T4', type: 'electrode' as const },
-  { id: 'pz', label: 'Pz', type: 'electrode' as const },
-  { id: 'oz', label: 'Oz', type: 'electrode' as const },
-  { id: 'fz', label: 'Fz', type: 'electrode' as const },
+  { id: 'fp1', label: 'Fp1', type: 'electrode' as const, x: 35, y: 15 },
+  { id: 'fp2', label: 'Fp2', type: 'electrode' as const, x: 65, y: 15 },
+  { id: 'f7', label: 'F7', type: 'electrode' as const, x: 15, y: 30 },
+  { id: 'f3', label: 'F3', type: 'electrode' as const, x: 35, y: 30 },
+  { id: 'fz', label: 'Fz', type: 'electrode' as const, x: 50, y: 25 },
+  { id: 'f4', label: 'F4', type: 'electrode' as const, x: 65, y: 30 },
+  { id: 'f8', label: 'F8', type: 'electrode' as const, x: 85, y: 30 },
+  { id: 't3', label: 'T3', type: 'electrode' as const, x: 10, y: 50 },
+  { id: 'c3', label: 'C3', type: 'electrode' as const, x: 35, y: 50 },
+  { id: 'cz', label: 'Cz', type: 'electrode' as const, x: 50, y: 50 },
+  { id: 'c4', label: 'C4', type: 'electrode' as const, x: 65, y: 50 },
+  { id: 't4', label: 'T4', type: 'electrode' as const, x: 90, y: 50 },
+  { id: 'p3', label: 'P3', type: 'electrode' as const, x: 35, y: 70 },
+  { id: 'pz', label: 'Pz', type: 'electrode' as const, x: 50, y: 70 },
+  { id: 'p4', label: 'P4', type: 'electrode' as const, x: 65, y: 70 },
+  { id: 'o1', label: 'O1', type: 'electrode' as const, x: 35, y: 85 },
+  { id: 'oz', label: 'Oz', type: 'electrode' as const, x: 50, y: 90 },
+  { id: 'o2', label: 'O2', type: 'electrode' as const, x: 65, y: 85 },
   { id: 'ref', label: 'REF', type: 'reference' as const },
   { id: 'gnd', label: 'GND', type: 'ground' as const },
 ]
@@ -81,6 +85,7 @@ export function ImpedanceChecker() {
     }))
   )
   const [isChecking, setIsChecking] = useState(false)
+  const [hoveredElectrode, setHoveredElectrode] = useState<string | null>(null)
 
   const checkImpedance = async () => {
     setIsChecking(true)
@@ -123,6 +128,9 @@ export function ImpedanceChecker() {
   const errorCount = electrodes.filter(e => e.status === 'error').length
   const progress = (okCount / electrodes.length) * 100
 
+  const scalpElectrodes = electrodes.filter(e => e.x !== undefined && e.y !== undefined)
+  const systemElectrodes = electrodes.filter(e => e.x === undefined || e.y === undefined)
+
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -138,7 +146,7 @@ export function ImpedanceChecker() {
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-6">
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">Overall Quality</span>
@@ -180,38 +188,157 @@ export function ImpedanceChecker() {
           </Badge>
         </div>
 
-        <ScrollArea className="h-[400px]">
-          <div className="grid gap-2 md:grid-cols-2">
-            {electrodes.map(electrode => (
-              <div
-                key={electrode.id}
-                className="flex items-center justify-between rounded border border-border bg-card p-3"
+        <div className="grid gap-6 lg:grid-cols-2">
+          <div className="space-y-3">
+            <h3 className="text-sm font-medium">Scalp Electrode Map</h3>
+            <div className="relative mx-auto aspect-square w-full max-w-sm rounded-lg border border-border bg-muted/20 p-4">
+              <svg
+                viewBox="0 0 100 100"
+                className="h-full w-full"
+                style={{ filter: 'drop-shadow(0 1px 2px rgb(0 0 0 / 0.1))' }}
               >
-                <div className="flex items-center gap-2">
-                  <div style={{ color: getStatusColor(electrode.status) }}>
-                    {getStatusIcon(electrode.status)}
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">{electrode.label}</span>
-                      {electrode.type !== 'electrode' && (
-                        <Badge variant="secondary" className="text-xs">
-                          {electrode.type.toUpperCase()}
-                        </Badge>
+                <ellipse
+                  cx="50"
+                  cy="52"
+                  rx="38"
+                  ry="42"
+                  fill="none"
+                  stroke="oklch(0.70 0 0)"
+                  strokeWidth="0.5"
+                  strokeDasharray="2 1"
+                />
+                
+                <path
+                  d="M 50 10 Q 46 5, 50 2 Q 54 5, 50 10"
+                  fill="none"
+                  stroke="oklch(0.70 0 0)"
+                  strokeWidth="0.5"
+                />
+                
+                <ellipse
+                  cx="20"
+                  cy="50"
+                  rx="3"
+                  ry="5"
+                  fill="oklch(0.96 0 0)"
+                  stroke="oklch(0.70 0 0)"
+                  strokeWidth="0.5"
+                />
+                <ellipse
+                  cx="80"
+                  cy="50"
+                  rx="3"
+                  ry="5"
+                  fill="oklch(0.96 0 0)"
+                  stroke="oklch(0.70 0 0)"
+                  strokeWidth="0.5"
+                />
+
+                {scalpElectrodes.map(electrode => {
+                  if (!electrode.x || !electrode.y) return null
+                  
+                  const isHovered = hoveredElectrode === electrode.id
+                  const radius = isHovered ? 4.5 : 3.5
+
+                  return (
+                    <g key={electrode.id}>
+                      <circle
+                        cx={electrode.x}
+                        cy={electrode.y}
+                        r={radius}
+                        fill={getStatusColor(electrode.status)}
+                        stroke="white"
+                        strokeWidth="1.2"
+                        className="cursor-pointer transition-all"
+                        onMouseEnter={() => setHoveredElectrode(electrode.id)}
+                        onMouseLeave={() => setHoveredElectrode(null)}
+                      />
+                      {electrode.status === 'checking' && (
+                        <circle
+                          cx={electrode.x}
+                          cy={electrode.y}
+                          r={radius + 2}
+                          fill="none"
+                          stroke={getStatusColor('checking')}
+                          strokeWidth="0.8"
+                          opacity="0.6"
+                          className="animate-ping"
+                        />
                       )}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      {electrode.status === 'checking' 
-                        ? 'Measuring...' 
-                        : `${electrode.value.toFixed(1)} kΩ`
-                      }
-                    </div>
-                  </div>
+                      <text
+                        x={electrode.x}
+                        y={electrode.y - 6}
+                        textAnchor="middle"
+                        fontSize="3"
+                        fontWeight={isHovered ? 'bold' : 'normal'}
+                        fill="oklch(0.20 0 0)"
+                        className="pointer-events-none select-none transition-all"
+                        style={{ 
+                          fontFamily: 'Inter, sans-serif',
+                          fontSize: isHovered ? '3.5px' : '3px'
+                        }}
+                      >
+                        {electrode.label}
+                      </text>
+                    </g>
+                  )
+                })}
+              </svg>
+            </div>
+
+            {hoveredElectrode && (
+              <div className="rounded border border-border bg-card p-3 text-center text-sm">
+                <div className="font-medium">
+                  {electrodes.find(e => e.id === hoveredElectrode)?.label}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {electrodes.find(e => e.id === hoveredElectrode)?.status === 'checking' 
+                    ? 'Measuring...' 
+                    : `${electrodes.find(e => e.id === hoveredElectrode)?.value.toFixed(1)} kΩ - ${electrodes.find(e => e.id === hoveredElectrode)?.status.toUpperCase()}`
+                  }
                 </div>
               </div>
-            ))}
+            )}
           </div>
-        </ScrollArea>
+
+          <div className="space-y-3">
+            <h3 className="text-sm font-medium">Electrode Details</h3>
+            <ScrollArea className="h-[400px]">
+              <div className="space-y-2 pr-4">
+                {electrodes.map(electrode => (
+                  <div
+                    key={electrode.id}
+                    className="flex items-center justify-between rounded border border-border bg-card p-3 transition-colors hover:bg-muted/30"
+                    onMouseEnter={() => electrode.x !== undefined && setHoveredElectrode(electrode.id)}
+                    onMouseLeave={() => setHoveredElectrode(null)}
+                  >
+                    <div className="flex items-center gap-2">
+                      <div style={{ color: getStatusColor(electrode.status) }}>
+                        {getStatusIcon(electrode.status)}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{electrode.label}</span>
+                          {electrode.type !== 'electrode' && (
+                            <Badge variant="secondary" className="text-xs">
+                              {electrode.type.toUpperCase()}
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {electrode.status === 'checking' 
+                            ? 'Measuring...' 
+                            : `${electrode.value.toFixed(1)} kΩ`
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+          </div>
+        </div>
       </CardContent>
     </Card>
   )
