@@ -31,6 +31,27 @@ function App() {
         return <ComprehensiveTab />
       case 'innovation':
         return <InnovationTab />
+      case 'open':
+      case 'eeg':
+      case 'trends':
+      case 'split-screen':
+      case 'video':
+      case 'process':
+      case 'patient':
+      case 'preferences':
+      case 'spike-review':
+      case 'full-screen':
+      case 'help':
+        return (
+          <div className="flex h-full items-center justify-center p-6">
+            <div className="text-center">
+              <h2 className="text-2xl font-semibold text-muted-foreground">
+                {activeView.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+              </h2>
+              <p className="mt-2 text-sm text-muted-foreground">This view is planned for a future release</p>
+            </div>
+          </div>
+        )
       default:
         return <SetupTab />
     }

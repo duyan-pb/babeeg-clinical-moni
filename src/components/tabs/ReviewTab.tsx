@@ -121,8 +121,8 @@ export function ReviewTab() {
       </div>
 
       <div className="flex min-h-0 flex-1 gap-4">
-        <div className="flex min-h-0 flex-1 flex-col gap-4">
-          <Card className="flex-[2] overflow-hidden">
+        <div className="flex min-h-0 flex-[3] flex-col gap-4">
+          <Card className="min-h-0 flex-1 overflow-hidden">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle>EEG Waveforms</CardTitle>
@@ -137,32 +137,34 @@ export function ReviewTab() {
           </Card>
 
           {!isLive && (
-            <div className="flex-1">
-              <EnhancedPlaybackControls sessionId="review-session" />
-            </div>
+            <Card>
+              <CardContent className="p-4">
+                <EnhancedPlaybackControls sessionId="review-session" />
+              </CardContent>
+            </Card>
           )}
         </div>
 
-        <div className="w-96">
-          <Tabs defaultValue="analysis" className="h-full">
+        <div className="flex min-h-0 flex-[2] flex-col">
+          <Tabs defaultValue="analysis" className="flex h-full flex-col">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="analysis">Analysis</TabsTrigger>
               <TabsTrigger value="monitoring">Monitor</TabsTrigger>
               <TabsTrigger value="notes">Notes</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="analysis" className="mt-4 space-y-4">
+            <TabsContent value="analysis" className="mt-4 flex-1 space-y-4 overflow-auto">
               <Spectrogram channelId="Fp1" isLive={isLive} timeWindow={30} />
               <FrequencyDomainAnalyzer channelId="Fp1" isLive={isLive} />
             </TabsContent>
 
-            <TabsContent value="monitoring" className="mt-4 space-y-4">
+            <TabsContent value="monitoring" className="mt-4 flex-1 space-y-4 overflow-auto">
               <AccelerometerStream isLive={isLive} timeWindow={timeWindow} />
               <ElectrodeScalpMap />
               <ImpedanceChecker />
             </TabsContent>
 
-            <TabsContent value="notes" className="mt-4 space-y-4">
+            <TabsContent value="notes" className="mt-4 flex-1 space-y-4 overflow-auto">
               <Card>
                 <CardHeader className="pb-3">
                   <CardTitle>Annotations</CardTitle>
