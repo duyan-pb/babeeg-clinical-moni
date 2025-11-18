@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { 
   FolderOpen, 
   Activity, 
@@ -11,7 +10,12 @@ import {
   SpeakerHigh,
   Wrench,
   ArrowsOut,
-  Question
+  Question,
+  MagnifyingGlass,
+  Database,
+  Upload,
+  ListChecks,
+  Lightbulb
 } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
@@ -24,17 +28,21 @@ interface LeftNavProps {
 
 export function LeftNav({ activeView, onViewChange }: LeftNavProps) {
   const navItems = [
+    { id: 'setup', label: 'Setup', icon: Wrench },
+    { id: 'review', label: 'Review', icon: MagnifyingGlass },
+    { id: 'data', label: 'Data', icon: Database },
+    { id: 'import', label: 'Import', icon: Upload },
+    { id: 'comprehensive', label: 'Comprehensive', icon: ListChecks },
+    { id: 'innovation', label: 'Innovation', icon: Lightbulb },
     { id: 'open', label: 'Open', icon: FolderOpen },
     { id: 'eeg', label: 'EEG', icon: Activity },
     { id: 'trends', label: 'Trends', icon: ChartLine },
     { id: 'split-screen', label: 'Split Screen', icon: MonitorPlay },
     { id: 'video', label: 'Video', icon: Video },
     { id: 'process', label: 'Process', icon: Scissors },
-    { id: 'clear', label: 'Clear', icon: Scissors, variant: 'destructive' },
     { id: 'patient', label: 'Patient', icon: User },
     { id: 'preferences', label: 'Preferences', icon: Gear },
     { id: 'spike-review', label: 'Spike Review', icon: SpeakerHigh },
-    { id: 'tools', label: 'Tools', icon: Wrench },
     { id: 'full-screen', label: 'Full Screen', icon: ArrowsOut },
     { id: 'help', label: 'Help', icon: Question },
   ]
@@ -48,7 +56,7 @@ export function LeftNav({ activeView, onViewChange }: LeftNavProps) {
           
           return (
             <div key={item.id} className="flex flex-col items-center">
-              {(index === 4 || index === 7 || index === 9) && (
+              {(index === 6 || index === 11 || index === 13) && (
                 <Separator className="my-1 w-10" />
               )}
               <Tooltip>
@@ -62,7 +70,6 @@ export function LeftNav({ activeView, onViewChange }: LeftNavProps) {
                     <Icon 
                       size={20} 
                       weight={isActive ? 'fill' : 'regular'}
-                      className={item.variant === 'destructive' ? 'text-destructive' : ''}
                     />
                     <span className="text-[9px] leading-none">{item.label.split(' ')[0]}</span>
                   </Button>

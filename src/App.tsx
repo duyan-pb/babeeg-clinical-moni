@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useState } from 'react'
 import { GlobalHeader, PatientStrip, SafetyStrip, Footer } from '@/components/layout/GlobalLayout'
 import { LeftNav } from '@/components/layout/LeftNav'
 import { SecurityBanner } from '@/components/layout/SecurityBanner'
@@ -16,7 +15,26 @@ import { Badge } from '@/components/ui/badge'
 function App() {
   const { syncStatus } = useOfflineSync()
   const [isRemoteAccess] = useState(false)
-  const [activeView, setActiveView] = useState('eeg')
+  const [activeView, setActiveView] = useState('setup')
+
+  const renderContent = () => {
+    switch (activeView) {
+      case 'setup':
+        return <SetupTab />
+      case 'review':
+        return <ReviewTab />
+      case 'data':
+        return <DataTab />
+      case 'import':
+        return <ImportTab />
+      case 'comprehensive':
+        return <ComprehensiveTab />
+      case 'innovation':
+        return <InnovationTab />
+      default:
+        return <SetupTab />
+    }
+  }
 
   return (
     <div className="flex h-screen flex-col overflow-hidden">
@@ -47,67 +65,7 @@ function App() {
         <LeftNav activeView={activeView} onViewChange={setActiveView} />
         
         <main className="flex-1 overflow-auto">
-          <Tabs defaultValue="setup" className="h-full">
-            <div className="border-b border-border bg-card px-6">
-              <TabsList className="h-12 w-full justify-start rounded-none border-0 bg-transparent p-0">
-                <TabsTrigger 
-                  value="setup" 
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
-                >
-                  Setup
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="review" 
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
-                >
-                  Review
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="data" 
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
-                >
-                  Data
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="import" 
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
-                >
-                  Import
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="comprehensive" 
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
-                >
-                  Comprehensive
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="innovation" 
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
-                >
-                  Innovation
-                </TabsTrigger>
-              </TabsList>
-            </div>
-
-            <TabsContent value="setup" className="m-0">
-              <SetupTab />
-            </TabsContent>
-            <TabsContent value="review" className="m-0">
-              <ReviewTab />
-            </TabsContent>
-            <TabsContent value="data" className="m-0">
-              <DataTab />
-            </TabsContent>
-            <TabsContent value="import" className="m-0">
-              <ImportTab />
-            </TabsContent>
-            <TabsContent value="comprehensive" className="m-0">
-              <ComprehensiveTab />
-            </TabsContent>
-            <TabsContent value="innovation" className="m-0">
-              <InnovationTab />
-            </TabsContent>
-          </Tabs>
+          {renderContent()}
         </main>
       </div>
 
