@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 interface FrequencyDomainProps {
   channelId?: string
   isLive?: boolean
+  cursorTime?: number
 }
 
 const FREQUENCY_BANDS = [
@@ -17,7 +18,7 @@ const FREQUENCY_BANDS = [
   { name: 'Gamma', range: '30-100 Hz', color: '#ef4444', min: 30, max: 100 },
 ]
 
-export function FrequencyDomainAnalyzer({ channelId = 'Fp1', isLive = false }: FrequencyDomainProps) {
+export function FrequencyDomainAnalyzer({ channelId = 'Fp1', isLive = false, cursorTime }: FrequencyDomainProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [nfft, setNfft] = useState<number>(256)
   const [selectedChannel, setSelectedChannel] = useState(channelId)
@@ -183,11 +184,18 @@ export function FrequencyDomainAnalyzer({ channelId = 'Fp1', isLive = false }: F
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle>Frequency Domain Analysis</CardTitle>
-          {isLive && (
-            <Badge variant="outline" className="bg-background">
-              LIVE
-            </Badge>
-          )}
+          <div className="flex items-center gap-2">
+            {typeof cursorTime === 'number' && (
+              <Badge variant="outline" className="text-xs">
+                Cursor: {cursorTime.toFixed(1)}s
+              </Badge>
+            )}
+            {isLive && (
+              <Badge variant="outline" className="bg-background">
+                LIVE
+              </Badge>
+            )}
+          </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">

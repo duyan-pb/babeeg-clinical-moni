@@ -1,12 +1,15 @@
 import { useState } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { Separator } from '@/components/ui/separator'
+import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { HelpDialog } from './HelpDialog'
 import { AuditLogViewer } from './AuditLogViewer'
 import { toast } from 'sonner'
+import { useSparkMode } from '@/lib/sparkContext'
 
 interface PatientData {
+  patientId: string
   mrn: string
   ga: string
   weight: string
@@ -15,7 +18,9 @@ interface PatientData {
 }
 
 export function GlobalHeader() {
+  const sparkMode = useSparkMode()
   const [patientData, setPatientData] = useKV<PatientData>('patient-data', {
+    patientId: 'Trẻ-##',
     mrn: '',
     ga: '',
     weight: '',
@@ -24,6 +29,7 @@ export function GlobalHeader() {
   })
 
   const data = patientData || {
+    patientId: 'Trẻ-##',
     mrn: '',
     ga: '',
     weight: '',
@@ -44,15 +50,22 @@ export function GlobalHeader() {
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-semibold tracking-tight">BabEEG</h1>
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
-            <span>LSL: Disconnected</span>
+            <span>LSL: Demo</span>
             <span>License: Active</span>
+            <span>Spark: {sparkMode === 'mock' ? 'Mock' : 'Live'}</span>
           </div>
         </div>
         
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
           <div className="flex items-center gap-2">
             <span className="text-muted-foreground">Patient:</span>
-            <span className="font-medium">Trẻ-##</span>
+            <input 
+              type="text"
+              className="h-6 w-28 rounded border border-input bg-background px-2 text-xs"
+              placeholder="Patient ID"
+              value={data.patientId}
+              onChange={(e) => handleUpdate('patientId', e.target.value)}
+            />
           </div>
           <div className="flex items-center gap-2">
             <span className="text-muted-foreground">MRN:</span>
@@ -112,7 +125,41 @@ export function GlobalHeader() {
 }
 
 export function PatientStrip() {
-  return null
+  const [patientData] = useKV<PatientData>('patient-data', {
+    patientId: 'Trẻ-##',
+    mrn: '',
+    ga: '',
+    weight: '',
+    clinician: '',
+    shift: 'Day'
+  })
+  const [activeDataset] = useKV<{ id: string; sessionName?: string; patientId?: string } | null>('active-dataset', null)
+  const data = patientData || {
+    patientId: 'Trẻ-##',
+    mrn: '',
+    ga: '',
+    weight: '',
+    clinician: '',
+    shift: 'Day' as const
+  }
+
+  return (
+    <div className="border-b border-border bg-[oklch(0.15_0.02_250)]/5 px-6 py-2">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+        <Badge variant="secondary">Patient Context</Badge>
+        <span>Patient: <span className="font-semibold">{data.patientId || 'Unset'}</span></span>
+        <span>MRN: <span className="font-semibold">{data.mrn || '—'}</span></span>
+        <span>GA: <span className="font-semibold">{data.ga || '—'} weeks</span></span>
+        <span>Weight: <span className="font-semibold">{data.weight || '—'} g</span></span>
+        <span>Shift: <span className="font-semibold">{data.shift}</span></span>
+        <Separator orientation="vertical" className="h-4" />
+        <span>Dataset: <span className="font-semibold">{activeDataset?.sessionName || 'Not selected'}</span></span>
+        <Badge variant="outline" className="ml-auto">
+          {activeDataset?.patientId ? `Linked to ${activeDataset.patientId}` : 'Awaiting dataset link'}
+        </Badge>
+      </div>
+    </div>
+  )
 }
 
 export function SafetyStrip() {

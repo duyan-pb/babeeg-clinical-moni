@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge'
-import { LockSimple } from '@phosphor-icons/react'
+import { LockSimple } from '@/lib/iconShim'
 
 interface ReadOnlyBadgeProps {
   isReadOnly: boolean

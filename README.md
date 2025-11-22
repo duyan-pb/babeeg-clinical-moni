@@ -21,3 +21,16 @@ No problem! If you were just checking things out and don’t need to keep this c
 📄 License For Spark Template Resources 
 
 The Spark Template files and resources from GitHub are licensed under the terms of the MIT license, Copyright GitHub, Inc.
+
+## Running locally with or without Spark
+
+- Install deps: `npm install`, then `npm run dev`.
+- The app will try `/_spark/kv` and `/_spark/user` on startup. If reachable, it uses the live Spark runtime.
+- If those endpoints are unreachable (or you set `VITE_SPARK_MODE=mock`), it falls back to an in-browser KV mock and stub user so demos work offline.
+- Mock KV data is stored in `localStorage` under `spark-kv-mock`; clear it to reset demo state.
+
+## Windows quickstart
+
+- Free the dev port if something is already running: `npm run kill -- 5000` (uses netstat/taskkill under the hood).
+- Start the app from PowerShell: `npm install` then `npm run dev -- --host 127.0.0.1 --port 5000`.
+- For the packaged demo, run `demo-kit/start-demo.ps1` which installs deps if needed and launches on port 5000.

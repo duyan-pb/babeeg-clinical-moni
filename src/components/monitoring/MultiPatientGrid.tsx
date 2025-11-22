@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { WifiHigh, WifiSlash, BatteryChargingVertical, BatteryWarning, ArrowRight } from '@phosphor-icons/react'
+import { WifiHigh, WifiSlash, BatteryChargingVertical, BatteryWarning, ArrowRight } from '@/lib/iconShim'
 import { toast } from 'sonner'
 
 interface PatientBed {

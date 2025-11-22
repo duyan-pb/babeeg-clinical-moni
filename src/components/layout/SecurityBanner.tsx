@@ -1,6 +1,6 @@
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
-import { ShieldWarning, WifiHigh, WifiSlash } from '@phosphor-icons/react'
+import { ShieldWarning, WifiHigh, WifiSlash } from '@/lib/iconShim'
 
 interface SecurityBannerProps {
   isRemote: boolean

@@ -4,8 +4,7 @@ import { ComponentProps, createContext, useCallback, useContext, useEffect, useS
 import useEmblaCarousel, {
   type UseEmblaCarouselType,
 } from "embla-carousel-react"
-import ArrowLeft from "lucide-react/dist/esm/icons/arrow-left"
-import ArrowRight from "lucide-react/dist/esm/icons/arrow-right"
+import { ArrowLeftPhosphor as ArrowLeft, ArrowRightPhosphor as ArrowRight } from "@/components/ui/phosphor-icons"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"

@@ -6,7 +6,8 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { ArrowClockwise, Download, FolderOpen, Archive, Trash } from '@phosphor-icons/react'
+import { ArrowClockwise, Download, FolderOpen, Archive, Trash } from '@/lib/iconShim'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { ExportDialog } from '@/components/export/ExportDialog'
 import { generateDummySessions } from '@/lib/dummy-data'
 import { toast } from 'sonner'
@@ -14,11 +15,27 @@ import type { Session } from '@/types'
 
 export function DataTab() {
   const [sessions, setSessions] = useKV<Session[]>('eeg-sessions', [])
+  const [activeDataset, setActiveDataset] = useKV<{ id: string; sessionName: string; patientId: string } | null>('active-dataset', null)
   const [selectedSession, setSelectedSession] = useState<Session | null>(null)
   const [exportDialogOpen, setExportDialogOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [filterType, setFilterType] = useState('all')
   const sessionList = sessions || []
+  const [patientData] = useKV<{
+    patientId: string
+    mrn: string
+    ga: string
+    weight: string
+    clinician: string
+    shift: 'Day' | 'Night'
+  }>('patient-data', {
+    patientId: 'Trẻ-##',
+    mrn: '',
+    ga: '',
+    weight: '',
+    clinician: '',
+    shift: 'Day'
+  })
 
   useEffect(() => {
     if (sessionList.length === 0) {
@@ -28,6 +45,11 @@ export function DataTab() {
 
   const handleSelectSession = (session: Session) => {
     setSelectedSession(session)
+    setActiveDataset({
+      id: session.id,
+      sessionName: session.sessionName,
+      patientId: session.patientId
+    })
     toast.info(`Selected session: ${session.sessionName}`)
   }
 
@@ -60,6 +82,11 @@ export function DataTab() {
       location: 'local'
     }
     setSessions((current) => [...(current || []), newSession])
+    setActiveDataset({
+      id: newSession.id,
+      sessionName: newSession.sessionName,
+      patientId: newSession.patientId
+    })
     toast.success('New session created')
   }
 
@@ -75,6 +102,7 @@ export function DataTab() {
     setSessions((current) => (current || []).filter(s => s.id !== session.id))
     if (selectedSession?.id === session.id) {
       setSelectedSession(null)
+      setActiveDataset(null)
     }
     toast.success(`Deleted ${session.sessionName}`)
   }
@@ -113,8 +141,26 @@ export function DataTab() {
   })
 
   return (
-    <div className="h-full overflow-auto">
-      <div className="space-y-4 p-6">
+    <div className="page-shell space-y-6">
+      <Card className="border border-border/70 bg-card/80 shadow-sm">
+        <CardContent className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-3 text-sm">
+            <Badge variant="outline">Patient</Badge>
+            <span className="font-semibold">{patientData?.patientId || 'Unset'}</span>
+            <span className="text-muted-foreground">MRN: {patientData?.mrn || '—'}</span>
+            <span className="text-muted-foreground">GA: {patientData?.ga || '—'} wks</span>
+          </div>
+          <div className="flex flex-wrap items-center gap-2 text-xs">
+            <Badge variant="outline">Dataset</Badge>
+            <span className="font-semibold">{activeDataset?.sessionName || 'Not selected'}</span>
+            <Badge variant="outline" className="text-[11px]">
+              {activeDataset?.patientId ? `Linked to ${activeDataset.patientId}` : 'Select a session to link'}
+            </Badge>
+            <Badge variant="outline" className="text-[11px]">Demo data</Badge>
+          </div>
+        </CardContent>
+      </Card>
+
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-lg border border-border bg-card p-4">
         <div className="flex flex-wrap items-center gap-4 text-sm">
           <span><span className="font-semibold">82%</span> used</span>
@@ -201,7 +247,7 @@ export function DataTab() {
                     {filteredSessions.map((session) => (
                       <TableRow 
                         key={session.id}
-                        className="cursor-pointer hover:bg-muted/50"
+                        className={`cursor-pointer hover:bg-muted/50 ${selectedSession?.id === session.id ? 'bg-muted/60' : ''}`}
                         onClick={() => handleSelectSession(session)}
                       >
                         <TableCell className="text-xs">{session.startTime}</TableCell>
@@ -222,35 +268,59 @@ export function DataTab() {
                         </TableCell>
                         <TableCell className="text-xs">{session.location}</TableCell>
                         <TableCell>
-                          <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
-                              onClick={() => handleOpenFolder(session)}
-                            >
-                              <FolderOpen className="h-4 w-4" />
-                            </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
-                              onClick={() => handleExport(session)}
-                            >
-                              <Download className="h-4 w-4" />
-                            </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
-                              onClick={() => handleArchive(session)}
-                            >
-                              <Archive className="h-4 w-4" />
-                            </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
-                              onClick={() => handleDelete(session)}
-                            >
-                              <Trash className="h-4 w-4" />
-                            </Button>
+                            <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm"
+                                  disabled={selectedSession?.id !== session.id}
+                                  onClick={() => handleOpenFolder(session)}
+                                >
+                                  <FolderOpen className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>Open session folder</TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm"
+                                  disabled={selectedSession?.id !== session.id}
+                                  onClick={() => handleExport(session)}
+                                >
+                                  <Download className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>Export session</TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm"
+                                  disabled={selectedSession?.id !== session.id}
+                                  onClick={() => handleArchive(session)}
+                                >
+                                  <Archive className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>Archive session</TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm"
+                                  disabled={selectedSession?.id !== session.id}
+                                  onClick={() => handleDelete(session)}
+                                >
+                                  <Trash className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>Delete session</TooltipContent>
+                            </Tooltip>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -378,6 +448,7 @@ export function DataTab() {
                 size="sm" 
                 className="w-full"
                 onClick={() => toast.info('Bulk archive started')}
+                disabled={!selectedSession}
               >
                 Bulk archive
               </Button>
@@ -386,6 +457,7 @@ export function DataTab() {
                 size="sm" 
                 className="w-full"
                 onClick={() => toast.info('Opening audit trail...')}
+                disabled={!selectedSession}
               >
                 Audit Trail
               </Button>
@@ -399,7 +471,6 @@ export function DataTab() {
         onOpenChange={setExportDialogOpen}
         sessionId={selectedSession?.id}
       />
-      </div>
     </div>
   )
 }

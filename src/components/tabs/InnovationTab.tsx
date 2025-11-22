@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Bell, ArrowClockwise, Flask } from '@phosphor-icons/react'
+import { Bell, ArrowClockwise, Flask } from '@/lib/iconShim'
 import { MultiPatientGrid } from '@/components/monitoring/MultiPatientGrid'
 import { toast } from 'sonner'
 
@@ -75,8 +75,7 @@ export function InnovationTab() {
   }
 
   return (
-    <div className="h-full overflow-auto">
-      <div className="space-y-6 p-6">
+    <div className="page-shell space-y-6">
       <Alert className="border-[oklch(0.70_0.18_75)] bg-[oklch(0.70_0.18_75)]/10">
         <Flask className="h-4 w-4" />
         <AlertDescription>
@@ -258,7 +257,6 @@ export function InnovationTab() {
           <Button onClick={handleSaveSandboxLog}>Save to Sandbox Log</Button>
         </CardContent>
       </Card>
-      </div>
     </div>
   )
 }

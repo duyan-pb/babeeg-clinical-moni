@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useKV } from '@github/spark/hooks'
 import { toast } from 'sonner'
 
@@ -9,7 +9,16 @@ interface SyncStatus {
   syncInProgress: boolean
 }
 
-export function useOfflineSync() {
+interface PatientData {
+  mrn?: string
+}
+
+interface OfflineSyncOptions {
+  sessionScope?: string
+  syncHandler?: (changes: any[], scopeKey: string) => Promise<void>
+}
+
+export function useOfflineSync(options?: OfflineSyncOptions) {
   const [syncStatus, setSyncStatus] = useState<SyncStatus>({
     isOnline: navigator.onLine,
     pendingChanges: 0,
@@ -17,7 +26,18 @@ export function useOfflineSync() {
     syncInProgress: false
   })
 
-  const [offlineQueue, setOfflineQueue] = useKV<any[]>('offline-sync-queue', [])
+  const [patientData] = useKV<PatientData>('patient-data')
+
+  const scopeKey = useMemo(() => {
+    if (options?.sessionScope && options.sessionScope.trim().length > 0) {
+      return options.sessionScope.trim()
+    }
+    const mrn = patientData?.mrn?.trim()
+    return mrn && mrn.length > 0 ? `patient-${mrn}` : 'global'
+  }, [patientData?.mrn, options?.sessionScope])
+
+  const queueKey = `offline-sync-queue-${scopeKey}`
+  const [offlineQueue, setOfflineQueue] = useKV<any[]>(queueKey, [])
 
   useEffect(() => {
     const handleOnline = () => {
@@ -45,7 +65,7 @@ export function useOfflineSync() {
       ...prev, 
       pendingChanges: offlineQueue?.length || 0 
     }))
-  }, [offlineQueue])
+  }, [offlineQueue, scopeKey])
 
   const queueChange = (changeType: string, data: any) => {
     const change = {
@@ -71,7 +91,11 @@ export function useOfflineSync() {
     setSyncStatus(prev => ({ ...prev, syncInProgress: true }))
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500))
+      if (options?.syncHandler) {
+        await options.syncHandler(queue, scopeKey)
+      } else {
+        await new Promise(resolve => setTimeout(resolve, 500))
+      }
       
       setOfflineQueue([])
       setSyncStatus(prev => ({ 

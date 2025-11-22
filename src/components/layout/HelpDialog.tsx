@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Question, Keyboard, ShieldCheck, BookOpen } from '@phosphor-icons/react'
+import { Question, Keyboard, ShieldCheck, BookOpen } from '@/lib/iconShim'
 
 export function HelpDialog() {
   const [open, setOpen] = useState(false)

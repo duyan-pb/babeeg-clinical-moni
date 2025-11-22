@@ -1,7 +1,11 @@
 import { Badge } from '@/components/ui/badge'
 import type { Electrode } from '@/types'
 
-const electrodes: Electrode[] = [
+interface ElectrodeGridProps {
+  electrodes?: Electrode[]
+}
+
+export const defaultElectrodes: Electrode[] = [
   { id: 'fp1', label: 'Fp1', status: 'ok' },
   { id: 'fp2', label: 'Fp2', status: 'ok' },
   { id: 'f3', label: 'F3', status: 'warn' },
@@ -32,7 +36,7 @@ function getStatusColor(status: Electrode['status']) {
   }
 }
 
-export function ElectrodeGrid() {
+export function ElectrodeGrid({ electrodes = defaultElectrodes }: ElectrodeGridProps) {
   return (
     <div>
       <div className="mb-4 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { ArrowClockwise, CheckCircle, Warning, XCircle } from '@phosphor-icons/react'
+import { ArrowClockwise, CheckCircle, Warning, XCircle } from '@/lib/iconShim'
 import { toast } from 'sonner'
 import headOutline from '@/assets/images/head-outline.svg'
 

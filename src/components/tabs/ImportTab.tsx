@@ -5,13 +5,14 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Progress } from '@/components/ui/progress'
-import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Separator } from '@/components/ui/separator'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { FolderOpen, FileArrowDown, CheckCircle, XCircle, Warning, ArrowsLeftRight } from '@phosphor-icons/react'
+import { Badge } from '@/components/ui/badge'
+import { FolderOpen, FileArrowDown, CheckCircle, XCircle, Warning, ArrowsLeftRight } from '@/lib/iconShim'
 import { toast } from 'sonner'
+import { Checkbox } from '@/components/ui/checkbox'
 
 type ValidationStatus = 'idle' | 'validating' | 'valid' | 'invalid'
 type ImportStatus = 'idle' | 'importing' | 'complete' | 'error'
@@ -37,6 +38,8 @@ export function ImportTab() {
   const [patientId, setPatientId] = useState<string>('')
   const [showChannelMapper, setShowChannelMapper] = useState(false)
   const [showSummary, setShowSummary] = useState(false)
+  const [consentForPhi, setConsentForPhi] = useState(false)
+  const [phiMinimize, setPhiMinimize] = useState(true)
 
   const [validationResult, setValidationResult] = useState<ValidationResult>({
     checksum: { status: 'pending' },
@@ -71,43 +74,53 @@ export function ImportTab() {
   }
 
   const handleValidate = () => {
+    if (!selectedFile) {
+      toast.error('Select a file before validating')
+      return
+    }
+    if (!consentForPhi) {
+      toast.error('Consent acknowledgement required before validation')
+      return
+    }
+
     setValidationStatus('validating')
     
     setTimeout(() => {
-      const hasGaps = Math.random() > 0.7
-      const checksumPass = Math.random() > 0.1
-      const schemaPass = Math.random() > 0.2
-      const channelsPass = Math.random() > 0.3
+      // Deterministic demo validation
+      const checksumPass = true
+      const schemaPass = patientId.trim().length > 0
+      const channelsPass = true
+      const hasGaps = false
 
       setValidationResult({
         checksum: { 
           status: checksumPass ? 'pass' : 'fail', 
-          value: checksumPass ? 'a3f2c9d1b8e4f7a2c9d1b8e4f7a2c9d1' : undefined 
+          value: 'a3f2c9d1b8e4f7a2c9d1b8e4f7a2c9d1' 
         },
         schema: { 
           status: schemaPass ? 'pass' : 'fail',
-          message: schemaPass ? 'EDF+ compliant' : 'Missing required header field: patient_id'
+          message: schemaPass ? 'EDF+ compliant' : 'Missing patient assignment'
         },
         gaps: { 
           detected: hasGaps, 
-          count: hasGaps ? 2 : 0,
-          details: hasGaps ? ['Gap at 00:34:12 (2.3s)', 'Gap at 01:45:28 (0.8s)'] : []
+          count: 0,
+          details: []
         },
         channels: { 
           status: channelsPass ? 'pass' : 'fail',
-          missing: channelsPass ? [] : ['Cz', 'Pz']
+          missing: []
         }
       })
 
-      const allPass = checksumPass && schemaPass && channelsPass
+      const allPass = checksumPass && schemaPass && channelsPass && !hasGaps
       setValidationStatus(allPass ? 'valid' : 'invalid')
       
       if (!allPass) {
-        toast.error('Validation failed - see details below')
+        toast.error('Validation failed - assign patient and fix schema')
       } else {
-        toast.success('File validated successfully')
+        toast.success('File validated successfully; ready to import')
       }
-    }, 2000)
+    }, 1200)
   }
 
   const handleImport = () => {
@@ -118,6 +131,11 @@ export function ImportTab() {
 
     if (!patientId.trim()) {
       toast.error('Patient assignment required')
+      return
+    }
+
+    if (!consentForPhi) {
+      toast.error('Consent required for PHI handling')
       return
     }
 
@@ -145,8 +163,7 @@ export function ImportTab() {
   }
 
   return (
-    <div className="h-full overflow-auto">
-      <div className="space-y-6 p-6">
+    <div className="page-shell space-y-6">
       <Card>
         <CardHeader>
           <CardTitle>Import EDF/EDF+ File</CardTitle>
@@ -218,6 +235,48 @@ export function ImportTab() {
               <ArrowsLeftRight className="mr-2" />
               Channel Mapper
             </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Consent & PHI Guardrails</CardTitle>
+          <CardDescription>UI-REQ-015: enforce consent marker, PHI minimization, audit stamp before import</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex items-start gap-2">
+            <Checkbox 
+              id="consent-import"
+              checked={consentForPhi}
+              onCheckedChange={(checked) => setConsentForPhi(checked === true)}
+            />
+            <div className="flex-1">
+              <Label htmlFor="consent-import" className="text-sm font-medium">
+                Consent marker on file
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                Required before validation/import to handle PHI.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-start gap-2">
+            <Checkbox 
+              id="phi-minimize-import"
+              checked={phiMinimize}
+              onCheckedChange={(checked) => setPhiMinimize(checked === true)}
+            />
+            <div className="flex-1">
+              <Label htmlFor="phi-minimize-import" className="text-sm">
+                PHI minimization
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                De-identify channels/labels during import for research workflows.
+              </p>
+            </div>
+          </div>
+          <div className="rounded-lg bg-muted/30 p-3 text-xs text-muted-foreground">
+            Audit stamp: {new Date().toISOString()} • PHI minimized: {phiMinimize ? 'yes' : 'no'}
           </div>
         </CardContent>
       </Card>
@@ -435,7 +494,6 @@ export function ImportTab() {
           </div>
         </DialogContent>
       </Dialog>
-      </div>
     </div>
   )
 }

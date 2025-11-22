@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { CheckCircle, Warning, XCircle } from '@phosphor-icons/react'
+import { CheckCircle, Warning, XCircle } from '@/lib/iconShim'
 import headOutline from '@/assets/images/head-outline.svg'
 
 export interface ElectrodePosition {

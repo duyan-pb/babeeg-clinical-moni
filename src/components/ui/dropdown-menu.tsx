@@ -2,9 +2,7 @@
 
 import { ComponentProps } from "react"
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu"
-import CheckIcon from "lucide-react/dist/esm/icons/check"
-import ChevronRightIcon from "lucide-react/dist/esm/icons/chevron-right"
-import CircleIcon from "lucide-react/dist/esm/icons/circle"
+import { CheckIcon, ChevronRightIcon, CircleIcon } from "@/components/ui/phosphor-icons"
 
 import { cn } from "@/lib/utils"
 

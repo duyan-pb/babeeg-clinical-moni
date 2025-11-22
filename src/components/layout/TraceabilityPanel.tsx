@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import { ShieldCheck, FileText, IdentificationCard } from '@phosphor-icons/react'
+import { ShieldCheck, FileText, IdentificationCard } from '@/lib/iconShim'
 
 interface TraceabilityPanelProps {
   sessionId?: string

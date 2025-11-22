@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { 
   Play, 
   Pause, 
@@ -17,7 +18,7 @@ import {
   MapPin,
   Trash,
   Download
-} from '@phosphor-icons/react'
+} from '@/lib/iconShim'
 import { toast } from 'sonner'
 import { usePlaybackEngine, Marker } from './PlaybackEngine'
 import {
@@ -68,18 +69,27 @@ export function EnhancedPlaybackControls({ sessionId }: EnhancedPlaybackControls
       pause()
       toast.info('Playback paused')
     } else {
+      if (playbackState.mode === 'live') {
+        setMode('playback')
+      }
       play()
       toast.info('Playback started')
     }
   }
 
   const handleSeek = (delta: number) => {
+    if (playbackState.mode === 'live') {
+      setMode('playback')
+    }
     seek(playbackState.currentTime + delta)
     toast.info(`Seeked ${delta > 0 ? '+' : ''}${delta}s`)
   }
 
   const handleSpeedChange = (speed: string) => {
     const speedValue = parseFloat(speed)
+    if (playbackState.mode === 'live') {
+      setMode('playback')
+    }
     setSpeed(speedValue)
     toast.info(`Playback speed: ${speed}x`)
   }
@@ -183,45 +193,72 @@ export function EnhancedPlaybackControls({ sessionId }: EnhancedPlaybackControls
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => seek(0)}
-            >
-              <SkipBack />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => seek(0)}
+                >
+                  <SkipBack />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Jump to start</TooltipContent>
+            </Tooltip>
             
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => handleSeek(-10)}
-            >
-              <Rewind />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => handleSeek(-10)}
+                >
+                  <Rewind />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Seek -10s (switches to playback)</TooltipContent>
+            </Tooltip>
 
-            <Button
-              size="icon"
-              onClick={handlePlayPause}
-              disabled={playbackState.mode === 'live'}
-            >
-              {playbackState.isPlaying ? <Pause weight="fill" /> : <Play weight="fill" />}
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="icon"
+                  onClick={handlePlayPause}
+                  disabled={playbackState.mode === 'live'}
+                >
+                  {playbackState.isPlaying ? <Pause weight="fill" /> : <Play weight="fill" />}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {playbackState.isPlaying ? 'Pause playback' : 'Play (switches from live)'}
+              </TooltipContent>
+            </Tooltip>
 
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => handleSeek(10)}
-            >
-              <FastForward />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => handleSeek(10)}
+                >
+                  <FastForward />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Seek +10s</TooltipContent>
+            </Tooltip>
 
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => seek(playbackState.duration)}
-            >
-              <SkipForward />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => seek(playbackState.duration)}
+                >
+                  <SkipForward />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Jump to end</TooltipContent>
+            </Tooltip>
 
             <div className="flex-1" />
 
@@ -242,54 +279,59 @@ export function EnhancedPlaybackControls({ sessionId }: EnhancedPlaybackControls
               </SelectContent>
             </Select>
 
-            <Dialog open={markerDialogOpen} onOpenChange={setMarkerDialogOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <MapPin className="mr-2" />
-                  Add Marker
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Add Marker</DialogTitle>
-                  <DialogDescription>
-                    Add an annotation marker at {formatTime(playbackState.currentTime)}
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4 py-4">
-                  <div className="space-y-2">
-                    <Label>Label</Label>
-                    <Input
-                      placeholder="Marker description"
-                      value={markerLabel}
-                      onChange={(e) => setMarkerLabel(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Type</Label>
-                    <Select value={markerType} onValueChange={(v) => setMarkerType(v as Marker['type'])}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="manual">Manual Annotation</SelectItem>
-                        <SelectItem value="trigger">Trigger Event</SelectItem>
-                        <SelectItem value="artifact">Artifact</SelectItem>
-                        <SelectItem value="seizure">Seizure</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setMarkerDialogOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button onClick={handleAddMarker}>
-                    Add Marker
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Dialog open={markerDialogOpen} onOpenChange={setMarkerDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <MapPin className="mr-2" />
+                      Add Marker
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Add Marker</DialogTitle>
+                      <DialogDescription>
+                        Add an annotation marker at {formatTime(playbackState.currentTime)}
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <div className="space-y-2">
+                        <Label>Label</Label>
+                        <Input
+                          placeholder="Marker description"
+                          value={markerLabel}
+                          onChange={(e) => setMarkerLabel(e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Type</Label>
+                        <Select value={markerType} onValueChange={(v) => setMarkerType(v as Marker['type'])}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="manual">Manual Annotation</SelectItem>
+                            <SelectItem value="trigger">Trigger Event</SelectItem>
+                            <SelectItem value="artifact">Artifact</SelectItem>
+                            <SelectItem value="seizure">Seizure</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setMarkerDialogOpen(false)}>
+                        Cancel
+                      </Button>
+                      <Button onClick={handleAddMarker}>
+                        Add Marker
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </TooltipTrigger>
+              <TooltipContent>Add and tag an annotation at the current time</TooltipContent>
+            </Tooltip>
           </div>
         </CardContent>
       </Card>

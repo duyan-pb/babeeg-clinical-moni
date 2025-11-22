@@ -13,6 +13,7 @@ interface EEGWaveformCanvasProps {
   channels?: Channel[]
   amplitude?: number
   isLive?: boolean
+  playbackTime?: number
 }
 
 export function EEGWaveformCanvas({
@@ -21,6 +22,7 @@ export function EEGWaveformCanvas({
   channels = [],
   amplitude = 100,
   isLive = true,
+  playbackTime = 0,
 }: EEGWaveformCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animationFrameRef = useRef<number | undefined>(undefined)
@@ -102,7 +104,7 @@ export function EEGWaveformCanvas({
     ctx.font = '10px Inter, sans-serif'
     for (let i = 0; i <= 10; i++) {
       const x = (i / 10) * rect.width
-      const time = i * timeStep
+      const time = i * timeStep + (isLive ? 0 : playbackTime)
       ctx.fillText(`${time.toFixed(1)}s`, x + 2, rect.height - 4)
     }
 
@@ -146,7 +148,19 @@ export function EEGWaveformCanvas({
   }
 
   const updateBuffers = () => {
-    if (!isLive) return
+    if (!isLive) {
+      // Render a static window aligned to the playback time
+      enabledChannels.forEach((channel, channelIndex) => {
+        const buffer = dataBuffersRef.current.get(channel.id)
+        if (!buffer) return
+
+        for (let i = 0; i < buffer.length; i++) {
+          const t = playbackTime + i / sampleRate
+          buffer[i] = generateEEGSample(t, channelIndex)
+        }
+      })
+      return
+    }
 
     const samplesPerFrame = Math.ceil(sampleRate / 60)
     
@@ -168,25 +182,29 @@ export function EEGWaveformCanvas({
   }
 
   useEffect(() => {
-    if (!isLive) return
+    if (isLive) {
+      const animate = () => {
+        updateBuffers()
+        drawWaveform()
+        animationFrameRef.current = requestAnimationFrame(animate)
+      }
 
-    const animate = () => {
-      updateBuffers()
-      drawWaveform()
       animationFrameRef.current = requestAnimationFrame(animate)
-    }
-
-    animationFrameRef.current = requestAnimationFrame(animate)
-
-    return () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current)
+      return () => {
+        if (animationFrameRef.current) {
+          cancelAnimationFrame(animationFrameRef.current)
+        }
       }
     }
-  }, [isLive, enabledChannels, timeWindow, amplitude, bufferSize])
+
+    // Playback/static: redraw whenever inputs change
+    updateBuffers()
+    drawWaveform()
+  }, [isLive, enabledChannels, timeWindow, amplitude, bufferSize, playbackTime])
 
   useEffect(() => {
     if (!isLive) {
+      updateBuffers()
       drawWaveform()
     }
   }, [isLive, enabledChannels])
@@ -200,8 +218,8 @@ export function EEGWaveformCanvas({
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
-  const minChannelHeight = 80
-  const calculatedHeight = Math.max(enabledChannels.length * minChannelHeight, 400)
+  const minChannelHeight = 50
+  const calculatedHeight = Math.max(enabledChannels.length * minChannelHeight, 300)
 
   return (
     <div className="relative w-full" style={{ height: `${calculatedHeight}px`, minHeight: '100%' }}>

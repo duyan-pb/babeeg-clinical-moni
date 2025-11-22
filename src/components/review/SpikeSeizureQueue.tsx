@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { CheckCircle, XCircle, ArrowRight, Sparkle } from '@phosphor-icons/react'
+import { CheckCircle, XCircle, ArrowRight, Sparkle } from '@/lib/iconShim'
 import { toast } from 'sonner'
 
 interface DetectedEvent {

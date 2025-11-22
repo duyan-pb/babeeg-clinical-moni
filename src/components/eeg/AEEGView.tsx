@@ -8,7 +8,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Separator } from '@/components/ui/separator'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
-import { Bell, BellSlash, ChartLine } from '@phosphor-icons/react'
+import { Bell, BellSlash, ChartLine } from '@/lib/iconShim'
 
 interface AEEGViewProps {
   isLive?: boolean

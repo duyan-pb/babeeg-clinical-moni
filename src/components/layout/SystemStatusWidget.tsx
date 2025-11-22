@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { CheckCircle, XCircle, Warning, Circle } from '@phosphor-icons/react'
+import { CheckCircle, XCircle, Warning, Circle } from '@/lib/iconShim'
 import { cn } from '@/lib/utils'
 
 interface StatusItem {

@@ -32,7 +32,10 @@ export interface AccelerometerData {
 }
 
 export function usePlaybackEngine(sessionId?: string) {
-  const [playbackState, setPlaybackState] = useKV<PlaybackState>('playback-state', {
+  const stateKey = sessionId ? `playback-state-${sessionId}` : 'playback-state'
+  const markersKey = sessionId ? `markers-${sessionId}` : 'markers-live'
+
+  const [playbackState, setPlaybackState] = useKV<PlaybackState>(stateKey, {
     isPlaying: false,
     currentTime: 0,
     duration: 3600,
@@ -40,7 +43,7 @@ export function usePlaybackEngine(sessionId?: string) {
     mode: 'live'
   })
 
-  const [markers, setMarkers, deleteMarkers] = useKV<Marker[]>(`markers-${sessionId || 'live'}`, [])
+  const [markers, setMarkers, deleteMarkers] = useKV<Marker[]>(markersKey, [])
   const animationFrameRef = useRef<number | undefined>(undefined)
   const lastUpdateRef = useRef<number>(performance.now())
 

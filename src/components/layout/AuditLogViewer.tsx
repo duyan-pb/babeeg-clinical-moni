@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Download, MagnifyingGlass, FileText } from '@phosphor-icons/react'
+import { Download, MagnifyingGlass, FileText } from '@/lib/iconShim'
 import { toast } from 'sonner'
 
 interface AuditEntry {

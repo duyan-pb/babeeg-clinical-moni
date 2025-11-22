@@ -8,9 +8,10 @@ interface SpectrogramProps {
   channelId?: string
   isLive?: boolean
   timeWindow?: number
+  cursorTime?: number
 }
 
-export function Spectrogram({ channelId = 'Fp1', isLive = false, timeWindow = 30 }: SpectrogramProps) {
+export function Spectrogram({ channelId = 'Fp1', isLive = false, timeWindow = 30, cursorTime }: SpectrogramProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const spectrogramDataRef = useRef<number[][]>([])
   const [selectedChannel, setSelectedChannel] = useState(channelId)
@@ -160,13 +161,20 @@ export function Spectrogram({ channelId = 'Fp1', isLive = false, timeWindow = 30
   return (
     <Card>
       <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-2">
           <CardTitle>Spectrogram</CardTitle>
-          {isLive && (
-            <Badge variant="outline" className="bg-background">
-              LIVE
-            </Badge>
-          )}
+          <div className="flex items-center gap-2">
+            {typeof cursorTime === 'number' && (
+              <Badge variant="outline" className="text-xs">
+                Cursor: {cursorTime.toFixed(1)}s
+              </Badge>
+            )}
+            {isLive && (
+              <Badge variant="outline" className="bg-background">
+                LIVE
+              </Badge>
+            )}
+          </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">

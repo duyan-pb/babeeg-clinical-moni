@@ -7,7 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Warning, ShieldCheck, FileArrowDown } from '@phosphor-icons/react'
+import { Warning, ShieldCheck, FileArrowDown } from '@/lib/iconShim'
 import { toast } from 'sonner'
 
 interface ExportDialogProps {

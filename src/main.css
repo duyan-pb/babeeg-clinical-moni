@@ -25,6 +25,87 @@
   ::backdrop,
   ::file-selector-button {
     border-color: var(--color-gray-200, currentColor);
+  } 
+}
+
+@layer utilities {
+  .page-shell {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 18px 18px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  @media (min-width: 1280px) {
+    .page-shell {
+      padding: 20px 22px 28px;
+      gap: 20px;
+    }
+  }
+
+  @media (min-width: 1536px) {
+    .page-shell {
+      padding: 26px 30px 40px;
+      gap: 24px;
+    }
+  }
+}
+
+@layer components {
+  .layout-16x9 {
+    --chrome-height: 240px;
+    min-height: 100vh;
+    background: radial-gradient(circle at 20% 20%, color-mix(in srgb, var(--color-muted) 65%, transparent) 0%, transparent 35%), var(--color-muted);
+  }
+
+  .layout-viewport {
+    width: min(1920px, calc((100vh - var(--chrome-height)) * 16 / 9));
+    height: calc(100vh - var(--chrome-height));
+    max-height: calc(100vh - var(--chrome-height));
+    margin: 0 auto;
+    flex: 1 1 auto;
+    display: grid;
+    grid-template-columns: 96px 1fr;
+    gap: 18px;
+    padding: 14px 22px 20px;
+    min-height: 0;
+  }
+
+  .viewport-canvas {
+    min-height: 0;
+    border: 1px solid var(--color-border);
+    border-radius: 18px;
+    background: color-mix(in srgb, var(--color-background) 92%, transparent);
+    box-shadow: 0 20px 48px -28px color-mix(in srgb, var(--color-foreground) 25%, transparent);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .viewport-scroll {
+    height: 100%;
+    overflow: auto;
+  }
+
+  @media (max-aspect-ratio: 16/9) {
+    .layout-viewport {
+      width: 100%;
+      max-width: 100%;
+    }
+  }
+
+  @media (max-width: 1200px) {
+    .layout-viewport {
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      max-height: none;
+      grid-template-columns: 88px 1fr;
+      padding: 12px 14px 18px;
+    }
   }
 }
 

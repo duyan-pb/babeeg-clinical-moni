@@ -15,7 +15,7 @@ import {
   EyeSlash,
   CheckCircle,
   Circle
-} from '@phosphor-icons/react'
+} from '@/lib/iconShim'
 import {
   Popover,
   PopoverContent,
@@ -51,15 +51,21 @@ const DEFAULT_CHANNELS: Channel[] = [
 interface LiveEEGStreamPanelProps {
   timeWindow: number
   isLive?: boolean
+  playbackTime?: number
+  onSwipeSeek?: (deltaSeconds: number) => void
 }
 
 export function LiveEEGStreamPanel({ 
   timeWindow,
-  isLive = true 
+  isLive = true,
+  playbackTime = 0,
+  onSwipeSeek
 }: LiveEEGStreamPanelProps) {
   const [channels, setChannels] = useKV<Channel[]>('eeg-channels', DEFAULT_CHANNELS)
   const [amplitude, setAmplitude] = useState(100)
   const [showControls, setShowControls] = useState(false)
+  const [dragging, setDragging] = useState(false)
+  const [lastX, setLastX] = useState<number | null>(null)
 
   const activeChannels = channels || DEFAULT_CHANNELS
 
@@ -73,8 +79,37 @@ export function LiveEEGStreamPanel({
 
   const enabledCount = activeChannels.filter(ch => ch.enabled).length
 
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!onSwipeSeek) return
+    setDragging(true)
+    setLastX(e.clientX)
+  }
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!onSwipeSeek || !dragging || lastX === null) return
+    const deltaX = e.clientX - lastX
+    const container = e.currentTarget
+    const width = container.getBoundingClientRect().width || 1
+    const deltaSeconds = (deltaX / width) * timeWindow
+    if (Math.abs(deltaSeconds) > 0.05) {
+      onSwipeSeek(deltaSeconds)
+      setLastX(e.clientX)
+    }
+  }
+
+  const handlePointerUp = () => {
+    setDragging(false)
+    setLastX(null)
+  }
+
   return (
-    <div className="relative flex h-full w-full flex-col overflow-hidden">
+    <div 
+      className="relative flex h-full w-full flex-col overflow-hidden"
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerUp}
+    >
       <div className="absolute left-4 top-4 z-10 flex items-center gap-2">
         <Badge variant="outline" className="bg-background/95 backdrop-blur">
           {enabledCount} / {activeChannels.length} channels
@@ -195,6 +230,7 @@ export function LiveEEGStreamPanel({
           channels={activeChannels}
           amplitude={amplitude}
           isLive={isLive}
+          playbackTime={playbackTime}
         />
       </div>
     </div>

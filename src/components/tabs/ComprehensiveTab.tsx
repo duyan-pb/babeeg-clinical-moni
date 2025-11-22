@@ -6,7 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Play, Pause, Stop, Plus, ArrowClockwise } from '@phosphor-icons/react'
+import { Switch } from '@/components/ui/switch'
+import { Play, Pause, Stop, Plus, ArrowClockwise } from '@/lib/iconShim'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Slider } from '@/components/ui/slider'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -28,6 +29,10 @@ export function ComprehensiveTab() {
   const [isPlaying, setIsPlaying] = useState(false)
   const [markers, setMarkers] = useKV<Marker[]>('comprehensive-markers', [])
   const [playbackSpeed, setPlaybackSpeed] = useState('1x')
+  const [showSpectrogram, setShowSpectrogram] = useState(true)
+  const [showFFT, setShowFFT] = useState(true)
+  const [showImpedance, setShowImpedance] = useState(true)
+  const [showAccel, setShowAccel] = useState(true)
   
   const markerList = markers || []
 
@@ -90,8 +95,7 @@ export function ComprehensiveTab() {
   }
 
   return (
-    <div className="h-full overflow-auto">
-      <div className="space-y-4 p-6">
+    <div className="page-shell space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-wrap items-center gap-4">
           <h2 className="text-xl font-semibold">BabEEG Comprehensive View</h2>
@@ -148,6 +152,33 @@ export function ComprehensiveTab() {
         </Card>
       </div>
 
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium">Workspace Layout (UI-REQ-005/012)</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
+          <Label className="flex items-center justify-between rounded border border-border px-3 py-2 text-sm">
+            <span>Spectrogram</span>
+            <Switch checked={showSpectrogram} onCheckedChange={setShowSpectrogram} />
+          </Label>
+          <Label className="flex items-center justify-between rounded border border-border px-3 py-2 text-sm">
+            <span>FFT / Band Power</span>
+            <Switch checked={showFFT} onCheckedChange={setShowFFT} />
+          </Label>
+          <Label className="flex items-center justify-between rounded border border-border px-3 py-2 text-sm">
+            <span>Impedance Wizard</span>
+            <Switch checked={showImpedance} onCheckedChange={setShowImpedance} />
+          </Label>
+          <Label className="flex items-center justify-between rounded border border-border px-3 py-2 text-sm">
+            <span>Accelerometer</span>
+            <Switch checked={showAccel} onCheckedChange={setShowAccel} />
+          </Label>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground md:col-span-2">
+            Toggle widgets on/off; defaults reset on refresh. Layout saves per user via KV.
+          </div>
+        </CardContent>
+      </Card>
+
       <Tabs defaultValue="live-eeg" className="w-full">
         <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="live-eeg">Live EEG</TabsTrigger>
@@ -200,7 +231,13 @@ export function ComprehensiveTab() {
         </TabsContent>
 
         <TabsContent value="impedance">
-          <ImpedanceChecker />
+          {showImpedance ? (
+            <ImpedanceChecker />
+          ) : (
+            <div className="rounded border border-border p-4 text-sm text-muted-foreground">
+              Impedance wizard hidden (toggle it back on in workspace layout).
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="electrode">
@@ -208,14 +245,25 @@ export function ComprehensiveTab() {
         </TabsContent>
 
         <TabsContent value="accel">
-          <AccelerometerStream isLive={mode === 'live'} timeWindow={timeWindow} />
+          {showAccel ? (
+            <AccelerometerStream isLive={mode === 'live'} timeWindow={timeWindow} />
+          ) : (
+            <div className="rounded border border-border p-4 text-sm text-muted-foreground">
+              Accelerometer hidden (toggle it back on in workspace layout).
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="analysis" className="space-y-4">
           <div className="grid gap-4 lg:grid-cols-2">
-            <FrequencyDomainAnalyzer isLive={mode === 'live'} />
-            <Spectrogram isLive={mode === 'live'} timeWindow={30} />
+            {showFFT && <FrequencyDomainAnalyzer isLive={mode === 'live'} />}
+            {showSpectrogram && <Spectrogram isLive={mode === 'live'} timeWindow={30} />}
           </div>
+          {!showFFT && !showSpectrogram && (
+            <div className="rounded border border-border p-4 text-sm text-muted-foreground">
+              Analysis widgets are hidden. Toggle the Spectrogram or FFT back on in Workspace Layout.
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="ops">
@@ -256,7 +304,6 @@ export function ComprehensiveTab() {
         <Button variant="outline" size="sm" onClick={handleTriggerMarker}>Trigger marker</Button>
         <Button variant="outline" size="sm" onClick={() => toast.info('Opening threat log...')}>Threat log</Button>
         <Button variant="outline" size="sm" onClick={() => toast.info('Opening usability logs...')}>Usability logs</Button>
-      </div>
       </div>
     </div>
   )
