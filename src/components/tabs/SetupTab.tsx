@@ -168,9 +168,9 @@ export function SetupTab() {
   return (
     <div className="page-shell space-y-6">
       <Card className="border-2 border-border/80 shadow-sm">
-        <CardContent className="space-y-3">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex flex-wrap items-center gap-3">
+        <CardContent className="space-y-1 py-2">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <h2 className="text-xl font-semibold">BabEEG Setup</h2>
               <Badge variant="outline" className={`flex items-center gap-2 text-xs ${deviceStatusTone}`}>
                 <ShieldCheck className="h-4 w-4" />
@@ -185,7 +185,7 @@ export function SetupTab() {
               <span className="text-muted-foreground">Auto-recognition {autoRecognized ? 'enabled' : 'paused for manual selection'}</span>
             </div>
           </div>
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Select
@@ -337,13 +337,13 @@ export function SetupTab() {
         </Alert>
       )}
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Patient Metadata</CardTitle>
+          <CardHeader className="pb-1">
+            <CardTitle className="text-xs font-medium">Patient Metadata</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="grid grid-cols-2 gap-2 text-xs">
+          <CardContent className="space-y-2">
+            <div className="grid grid-cols-2 gap-1 text-xs">
               <Input
                 placeholder="Patient ID"
                 value={patientMeta?.patientId || ''}
@@ -376,10 +376,10 @@ export function SetupTab() {
         </Card>
 
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">LSL Telemetry</CardTitle>
+          <CardHeader className="pb-1">
+            <CardTitle className="text-xs font-medium">LSL Telemetry</CardTitle>
           </CardHeader>
-          <CardContent className="grid grid-cols-2 gap-3 text-sm">
+          <CardContent className="grid grid-cols-2 gap-2 py-2 text-xs">
             <div>
               <div className="text-xs text-muted-foreground">Name</div>
               <div className="font-medium">{lslMeta.name || '—'}</div>
@@ -414,10 +414,10 @@ export function SetupTab() {
         </Card>
 
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Recording Safety Controls</CardTitle>
+          <CardHeader className="pb-1">
+            <CardTitle className="text-xs font-medium">Recording Safety Controls</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3 text-sm">
+          <CardContent className="space-y-2 py-2 text-xs">
             <div className="flex items-center justify-between rounded border border-border px-3 py-2">
               <span>Loss watchdog</span>
               <Badge variant={packetLoss > 0.05 || bufferLevel > 85 ? 'destructive' : 'outline'}>
@@ -450,10 +450,10 @@ export function SetupTab() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
+      <div className="grid grid-cols-2 gap-1 md:grid-cols-3 lg:grid-cols-6">
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Channels</CardTitle>
+          <CardHeader className="pb-1">
+            <CardTitle className="text-xs font-medium">Channels</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-semibold">{selectedStream ? '32' : '-'}</div>
@@ -506,8 +506,8 @@ export function SetupTab() {
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-sm">
             <span>Preflight Checklist</span>
             <Badge variant={allChecksPassed ? 'default' : 'outline'}>
               {Object.values(checks).filter(Boolean).length} / {Object.keys(checks).length}
@@ -515,7 +515,7 @@ export function SetupTab() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
             <div className="flex items-center gap-2">
               <Checkbox
                 id="electrodes-verified"
@@ -585,7 +585,7 @@ export function SetupTab() {
         </CardContent>
       </Card>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-3 lg:grid-cols-3">
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
@@ -600,7 +600,7 @@ export function SetupTab() {
               </Button>
             </div>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-1 p-2">
             <div className="flex flex-wrap gap-2 text-xs">
               <div className="flex items-center gap-1">
                 <div className="h-3 w-3 rounded-full bg-[oklch(0.60_0.15_145)]" />

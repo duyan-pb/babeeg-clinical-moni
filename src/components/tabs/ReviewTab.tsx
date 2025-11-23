@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
+import { Separator } from '@/components/ui/separator'
 import { LiveEEGStreamPanel } from '@/components/eeg/LiveEEGStreamPanel'
 import { EnhancedPlaybackControls } from '@/components/eeg/EnhancedPlaybackControls'
 import { AccelerometerStream } from '@/components/eeg/AccelerometerStream'
@@ -22,10 +23,11 @@ import { usePlaybackEngine } from '@/components/eeg/PlaybackEngine'
 export function ReviewTab() {
   const { playbackState, setMode, seek } = usePlaybackEngine('review-session')
   const [exportDialogOpen, setExportDialogOpen] = useState(false)
-  const [selectedInterval, setSelectedInterval] = useState('30m')
+  const [selectedInterval, setSelectedInterval] = useState('all')
   const [selectedEventType, setSelectedEventType] = useState('seizure')
   const [selectedArtifact, setSelectedArtifact] = useState('hide')
   const [selectedMontage, setSelectedMontage] = useState('10-20')
+  const [amplitudeScale, setAmplitudeScale] = useState(100)
   const [annotation, setAnnotation] = useState('')
   const [timeWindow, setTimeWindow] = useState(10)
   const [nurseMode, setNurseMode] = useState(false)
@@ -107,106 +109,152 @@ export function ReviewTab() {
   }
 
   return (
-    <div className="page-shell space-y-6">
-      <div className="flex flex-shrink-0 flex-wrap items-center gap-3 rounded-lg border border-border bg-card p-4">
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className="text-[11px]">Demo data</Badge>
-          <Switch
-            id="remote-toggle"
-            checked={remoteMode}
-            onCheckedChange={(checked) => {
-              setRemoteMode(checked)
-              toast.info(checked ? 'Remote/read-only mode enabled' : 'Remote mode disabled')
-            }}
-          />
-          <Label htmlFor="remote-toggle" className="text-sm">Remote / Read-only</Label>
-        </div>
-
-        <div className="h-6 w-px bg-border" />
-
-        <div className="flex items-center gap-2">
-          <Switch
-            id="mode-toggle"
-            checked={playbackState.mode === 'playback'}
-            onCheckedChange={handleModeToggle}
-          />
-          <Label htmlFor="mode-toggle" className="text-sm font-medium">
-            {isLive ? 'Live Stream' : 'Playback Mode'}
-          </Label>
-        </div>
-        
-        <div className="h-6 w-px bg-border" />
-
-        <div className="flex items-center gap-2">
-          <Switch
-            id="nurse-mode"
-            checked={nurseMode}
-            onCheckedChange={(checked) => {
-              setNurseMode(checked)
-              toast.info(checked ? 'Nurse mode enabled (minimal controls)' : 'Nurse mode disabled')
-            }}
-          />
-          <Label htmlFor="nurse-mode" className="text-sm font-medium">Nurse mode</Label>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Interval:</span>
-          <Select value={selectedInterval} onValueChange={setSelectedInterval}>
-            <SelectTrigger className="w-32">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="10m">Last 10m</SelectItem>
-              <SelectItem value="30m">Last 30m</SelectItem>
-              <SelectItem value="1h">Last 1h</SelectItem>
-              <SelectItem value="all">All</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Event Type:</span>
-          <Select value={selectedEventType} onValueChange={setSelectedEventType}>
-            <SelectTrigger className="w-32">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              <SelectItem value="seizure">Seizure</SelectItem>
-              <SelectItem value="artifact">Artifact</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Montage:</span>
+    <div className="page-shell h-full space-y-4 overflow-hidden">
+      <div className="flex flex-shrink-0 flex-wrap items-center gap-1 rounded-lg border border-border bg-card px-3 py-2 text-sm">
+        {/* EEG Display Controls - Priority at top */}
+        <div className="flex items-center gap-1">
+          <Label htmlFor="montage-select" className="text-xs font-medium">Montage:</Label>
           <Select value={selectedMontage} onValueChange={setSelectedMontage}>
-            <SelectTrigger className="w-32">
+            <SelectTrigger id="montage-select" className="h-7 w-24 text-xs">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="10-20">10-20</SelectItem>
-              <SelectItem value="10-10">10-10</SelectItem>
+              <SelectItem value="bipolar">Bipolar</SelectItem>
+              <SelectItem value="referential">Referential</SelectItem>
+              <SelectItem value="average">Average</SelectItem>
             </SelectContent>
           </Select>
         </div>
-        <Button size="sm" onClick={handleApplyFilters} disabled={remoteMode}>Apply</Button>
-        <Button variant="outline" size="sm" onClick={handleResetFilters} disabled={remoteMode}>Reset</Button>
+
+        <Separator orientation="vertical" className="h-5" />
+
+        <div className="flex items-center gap-1">
+          <Label htmlFor="scale-select" className="text-xs font-medium">Scale:</Label>
+          <Select value={`${amplitudeScale}`} onValueChange={(v) => setAmplitudeScale(Number(v))}>
+            <SelectTrigger id="scale-select" className="h-7 w-24 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="20">20 µV</SelectItem>
+              <SelectItem value="50">50 µV</SelectItem>
+              <SelectItem value="100">100 µV</SelectItem>
+              <SelectItem value="200">200 µV</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <Separator orientation="vertical" className="h-5" />
+
+        {/* Mode toggles */}
+        <div className="flex items-center gap-1">
+          <Badge variant="outline" className="text-[10px]">Demo</Badge>
+          <div className="flex items-center gap-1">
+            <Switch
+              id="mode-toggle"
+              checked={!isLive} // Checked means playback, so !isLive
+              onCheckedChange={handleModeToggle}
+              className="scale-75"
+            />
+            <Label htmlFor="mode-toggle" className="text-xs font-medium">
+              {isLive ? 'Live' : 'Playback'}
+            </Label>
+          </div>
+          <div className="flex items-center gap-1">
+            <Switch
+              id="ai-mode"
+              checked={aiRunning}
+              onCheckedChange={setAiRunning}
+              className="scale-75"
+            />
+            <Label htmlFor="ai-mode" className="text-xs font-medium">AI</Label>
+          </div>
+          <div className="flex items-center gap-1">
+            <Switch
+              id="nurse-mode"
+              checked={nurseMode}
+              onCheckedChange={(checked) => {
+                setNurseMode(checked)
+                toast.info(checked ? 'Nurse mode enabled' : 'Nurse mode disabled')
+              }}
+              className="scale-75"
+            />
+            <Label htmlFor="nurse-mode" className="text-xs font-medium">Nurse</Label>
+          </div>
+        </div>
+
+        <div className="ml-auto flex items-center gap-1">
+          <div className="flex items-center gap-1">
+            <Switch
+              id="remote-toggle"
+              checked={remoteMode}
+              onCheckedChange={(checked) => {
+                setRemoteMode(checked)
+                toast.info(checked ? 'Remote/read-only mode enabled' : 'Remote mode disabled')
+              }}
+              className="scale-75"
+            />
+            <Label htmlFor="remote-toggle" className="text-xs">Remote</Label>
+          </div>
+
+          <div className="flex items-center gap-1">
+            <span className="text-xs text-muted-foreground">Int:</span>
+            <Select value={selectedInterval} onValueChange={setSelectedInterval}>
+              <SelectTrigger className="h-7 w-24 text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="10m">Last 10m</SelectItem>
+                <SelectItem value="30m">Last 30m</SelectItem>
+                <SelectItem value="1h">Last 1h</SelectItem>
+                <SelectItem value="all">All</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="text-xs text-muted-foreground">Type:</span>
+            <Select value={selectedEventType} onValueChange={setSelectedEventType}>
+              <SelectTrigger className="h-7 w-24 text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="seizure">Seizure</SelectItem>
+                <SelectItem value="artifact">Artifact</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="text-xs text-muted-foreground">Mtg:</span>
+            <Select value={selectedMontage} onValueChange={setSelectedMontage}>
+              <SelectTrigger className="h-7 w-24 text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="10-20">10-20</SelectItem>
+                <SelectItem value="10-10">10-10</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <Button size="sm" className="h-7 text-xs" onClick={handleApplyFilters} disabled={remoteMode}>Apply</Button>
+          <Button variant="outline" size="sm" className="h-7 text-xs" onClick={handleResetFilters} disabled={remoteMode}>Reset</Button>
+        </div>
       </div>
 
-      <div className="flex min-h-0 flex-1 gap-4">
-        <div className="flex min-h-0 flex-[3] flex-col gap-4">
+      <div className="flex min-h-0 flex-1 gap-2">
+        <div className="flex min-h-0 flex-[65] flex-col gap-2">
           <Card className="flex min-h-0 flex-1 flex-col overflow-hidden">
-            <CardHeader className="flex-shrink-0 pb-3">
+            <CardHeader className="flex-shrink-0 pb-2 py-2">
               <div className="flex items-center justify-between">
-                <CardTitle>EEG Waveforms</CardTitle>
+                <CardTitle className="text-sm">EEG Waveforms</CardTitle>
                 <Badge variant={isLive ? 'destructive' : 'outline'}>
                   {isLive ? 'LIVE' : 'PLAYBACK'}
                 </Badge>
               </div>
             </CardHeader>
             <CardContent className="min-h-0 flex-1 p-0">
-              <LiveEEGStreamPanel 
-                timeWindow={timeWindow} 
-                isLive={isLive} 
+              <LiveEEGStreamPanel
+                timeWindow={timeWindow}
+                isLive={isLive}
                 playbackTime={playbackState.currentTime}
                 onSwipeSeek={handleSwipeSeek}
               />
@@ -215,14 +263,14 @@ export function ReviewTab() {
 
           {!isLive && (
             <Card className="flex-shrink-0">
-              <CardContent className="p-4">
+              <CardContent className="p-3">
                 <EnhancedPlaybackControls sessionId="review-session" />
               </CardContent>
             </Card>
           )}
         </div>
 
-        <div className="flex min-h-0 flex-[2] flex-col overflow-hidden">
+        <div className="flex min-h-0 flex-[35] flex-col overflow-hidden">
           <Tabs defaultValue="analysis" className="flex h-full flex-col overflow-hidden">
             <TabsList className="grid w-full flex-shrink-0 grid-cols-3">
               <TabsTrigger value="analysis">Analysis</TabsTrigger>
@@ -230,11 +278,11 @@ export function ReviewTab() {
               <TabsTrigger value="notes">Notes</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="analysis" className="mt-4 min-h-0 flex-1 space-y-4 overflow-auto">
+            <TabsContent value="analysis" className="mt-3 min-h-0 flex-1 space-y-3 overflow-auto">
               <Card>
-                <CardHeader className="pb-3">
+                <CardHeader className="pb-2 py-2">
                   <div className="flex items-center justify-between">
-                    <CardTitle>Alert Sources</CardTitle>
+                    <CardTitle className="text-sm">Alert Sources</CardTitle>
                     <div className="flex items-center gap-2">
                       <Badge variant={aiRunning ? 'destructive' : 'outline'}>
                         {aiRunning ? 'AI running' : 'AI paused'}
@@ -271,15 +319,15 @@ export function ReviewTab() {
                     ))}
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    <Button 
-                      size="sm" 
+                    <Button
+                      size="sm"
                       variant="outline"
                       onClick={() => setAiRunning(!aiRunning)}
                     >
                       {aiRunning ? 'Pause AI alerts' : 'Resume AI alerts'}
                     </Button>
-                    <Button 
-                      size="sm" 
+                    <Button
+                      size="sm"
                       variant="outline"
                       onClick={() => toast.info('Threshold list exported for audit')}
                     >
@@ -295,11 +343,11 @@ export function ReviewTab() {
               </div>
             </TabsContent>
 
-            <TabsContent value="monitoring" className="mt-4 min-h-0 flex-1 space-y-4 overflow-auto">
-              <div className="grid gap-4 md:grid-cols-2">
+            <TabsContent value="monitoring" className="mt-3 min-h-0 flex-1 space-y-3 overflow-auto">
+              <div className="grid gap-3 md:grid-cols-2">
                 <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle>In-ear Temperature</CardTitle>
+                  <CardHeader className="pb-2 py-2">
+                    <CardTitle className="text-sm">In-ear Temperature</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
@@ -314,8 +362,8 @@ export function ReviewTab() {
                   </CardContent>
                 </Card>
                 <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle>Microphone</CardTitle>
+                  <CardHeader className="pb-2 py-2">
+                    <CardTitle className="text-sm">Microphone</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
@@ -351,14 +399,14 @@ export function ReviewTab() {
               </div>
             </TabsContent>
 
-            <TabsContent value="notes" className="mt-4 min-h-0 flex-1 space-y-4 overflow-auto">
+            <TabsContent value="notes" className="mt-3 min-h-0 flex-1 space-y-3 overflow-auto">
               <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle>Annotations</CardTitle>
+                <CardHeader className="pb-2 py-2">
+                  <CardTitle className="text-sm">Annotations</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <Textarea 
-                    placeholder="Add clinical notes and observations..." 
+                  <Textarea
+                    placeholder="Add clinical notes and observations..."
                     rows={8}
                     value={annotation}
                     onChange={(e) => setAnnotation(e.target.value)}
@@ -371,8 +419,8 @@ export function ReviewTab() {
               </Card>
 
               <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle>Session Info</CardTitle>
+                <CardHeader className="pb-2 py-2">
+                  <CardTitle className="text-sm">Session Info</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2 text-sm">
                   <div className="flex justify-between">
@@ -389,9 +437,9 @@ export function ReviewTab() {
                       OK
                     </Badge>
                   </div>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                  <Button
+                    variant="outline"
+                    size="sm"
                     className="mt-4 w-full"
                     onClick={() => setExportDialogOpen(true)}
                   >
@@ -405,29 +453,30 @@ export function ReviewTab() {
       </div>
 
       <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg">AI Spike / Seizure Queue</CardTitle>
+        <CardHeader className="pb-2 py-2">
+          <CardTitle className="text-base">AI Spike / Seizure Queue</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="text-xs text-muted-foreground">Admit/reject events; jump-to-time keeps waveforms, event list, and spectrogram aligned (UI-REQ-009).</div>
           <div className="grid gap-2 md:grid-cols-3">
-                {spikeQueue.map(event => (
-                  <div key={event.id} className="rounded-lg border border-border p-3">
-                    <div className="flex items-center justify-between">
-                      <div className="text-sm font-semibold">{event.label}</div>
-                      <div className="flex items-center gap-2">
-                        <Badge variant={event.source.toLowerCase().includes('ai') ? 'destructive' : 'outline'}>
-                          {event.source.toLowerCase().includes('ai') ? 'AI' : 'Threshold'}
-                        </Badge>
-                        <Badge variant={event.confidence >= seizureThreshold ? 'destructive' : 'outline'}>
-                          {(event.confidence * 100).toFixed(0)}%
-                        </Badge>
-                      </div>
-                    </div>
-                    <div className="mt-1 text-xs text-muted-foreground">t={event.timestamp} • {event.source}</div>
-                    <div className="mt-2 flex items-center gap-2">
-                      <Button
-                    size="xs"
+            {spikeQueue.map(event => (
+              <div key={event.id} className="rounded-lg border border-border p-3">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm font-semibold">{event.label}</div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant={event.source.toLowerCase().includes('ai') ? 'destructive' : 'outline'}>
+                      {event.source.toLowerCase().includes('ai') ? 'AI' : 'Threshold'}
+                    </Badge>
+                    <Badge variant={event.confidence >= seizureThreshold ? 'destructive' : 'outline'}>
+                      {(event.confidence * 100).toFixed(0)}%
+                    </Badge>
+                  </div>
+                </div>
+                <div className="mt-1 text-xs text-muted-foreground">t={event.timestamp} • {event.source}</div>
+                <div className="mt-2 flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    className="h-6 px-2 text-xs"
                     variant="outline"
                     onClick={() => toast.success(`Admitted ${event.id}`)}
                     disabled={remoteMode}
@@ -435,7 +484,8 @@ export function ReviewTab() {
                     Admit
                   </Button>
                   <Button
-                    size="xs"
+                    size="sm"
+                    className="h-6 px-2 text-xs"
                     variant="outline"
                     onClick={() => {
                       setSpikeQueue((current) => (current || []).filter(e => e.id !== event.id))
@@ -446,7 +496,8 @@ export function ReviewTab() {
                     Reject
                   </Button>
                   <Button
-                    size="xs"
+                    size="sm"
+                    className="h-6 px-2 text-xs"
                     variant="ghost"
                     onClick={() => handleJumpToTime(event.timestamp)}
                   >
@@ -473,8 +524,8 @@ export function ReviewTab() {
       </Card>
 
       <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Remote / Offline Guardrails</CardTitle>
+        <CardHeader className="pb-2 py-2">
+          <CardTitle className="text-base">Remote / Offline Guardrails</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex flex-wrap items-center gap-2 text-sm">
@@ -496,7 +547,7 @@ export function ReviewTab() {
         </CardContent>
       </Card>
 
-      <ExportDialog 
+      <ExportDialog
         open={exportDialogOpen}
         onOpenChange={setExportDialogOpen}
         sessionId="session-12345"

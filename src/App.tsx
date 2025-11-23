@@ -17,7 +17,7 @@ function App() {
   const { syncStatus } = useOfflineSync()
   const [isRemoteAccess] = useState(false)
   const [activeView, setActiveView] = useState('setup')
-  const chromeHeight = 240 + (isRemoteAccess ? 48 : 0) + (!syncStatus.isOnline ? 32 : 0)
+  const chromeHeight = 220 + (isRemoteAccess ? 40 : 0) + (!syncStatus.isOnline ? 28 : 0)
 
   const renderContent = () => {
     switch (activeView) {
@@ -50,16 +50,16 @@ function App() {
   }
 
   return (
-    <div 
-      className="layout-16x9 flex h-screen flex-col overflow-hidden bg-muted/30" 
+    <div
+      className="layout-16x9 flex h-screen flex-col overflow-hidden bg-muted/30"
       style={{ ['--chrome-height' as string]: `${chromeHeight}px` }}
     >
       <GlobalHeader />
       <SafetyStrip />
       <PatientStrip />
-      
+
       {isRemoteAccess && (
-        <div className="px-6 pt-4">
+        <div className="px-4 pt-2">
           <SecurityBanner isRemote={isRemoteAccess} isOnline={syncStatus.isOnline} />
         </div>
       )}
@@ -76,10 +76,10 @@ function App() {
           </div>
         </div>
       )}
-      
+
       <div className="layout-viewport">
         <LeftNav activeView={activeView} onViewChange={setActiveView} />
-        
+
         <main className="viewport-canvas">
           <div className="viewport-scroll">
             {renderContent()}

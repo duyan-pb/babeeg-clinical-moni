@@ -33,7 +33,7 @@ export function ComprehensiveTab() {
   const [showFFT, setShowFFT] = useState(true)
   const [showImpedance, setShowImpedance] = useState(true)
   const [showAccel, setShowAccel] = useState(true)
-  
+
   const markerList = markers || []
 
   const handleModeSwitch = () => {
@@ -95,15 +95,15 @@ export function ComprehensiveTab() {
   }
 
   return (
-    <div className="page-shell space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex flex-wrap items-center gap-4">
-          <h2 className="text-xl font-semibold">BabEEG Comprehensive View</h2>
+    <div className="page-shell space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <h2 className="text-lg font-semibold">BabEEG Comprehensive View</h2>
           <Badge variant="outline">Mode: {mode === 'live' ? 'Live' : 'Playback'}</Badge>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <Button 
-            variant="outline" 
+        <div className="flex flex-wrap items-center gap-1">
+          <Button
+            variant="outline"
             onClick={handleModeSwitch}
           >
             Switch to {mode === 'live' ? 'Playback' : 'Live'}
@@ -115,10 +115,10 @@ export function ComprehensiveTab() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-1 md:grid-cols-4">
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Status</CardTitle>
+          <CardHeader className="pb-1 py-2">
+            <CardTitle className="text-xs font-medium">Status</CardTitle>
           </CardHeader>
           <CardContent>
             <Badge variant={mode === 'live' ? 'default' : 'outline'}>
@@ -153,10 +153,10 @@ export function ComprehensiveTab() {
       </div>
 
       <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">Workspace Layout (UI-REQ-005/012)</CardTitle>
+        <CardHeader className="pb-1 py-2">
+          <CardTitle className="text-xs font-medium">Workspace Layout (UI-REQ-005/012)</CardTitle>
         </CardHeader>
-        <CardContent className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
+        <CardContent className="grid gap-2 py-2 md:grid-cols-2 lg:grid-cols-3">
           <Label className="flex items-center justify-between rounded border border-border px-3 py-2 text-sm">
             <span>Spectrogram</span>
             <Switch checked={showSpectrogram} onCheckedChange={setShowSpectrogram} />
@@ -190,21 +190,21 @@ export function ComprehensiveTab() {
           <TabsTrigger value="ops">Ops Center</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="live-eeg" className="space-y-4">
+        <TabsContent value="live-eeg" className="space-y-3">
           <Card className="flex flex-col">
-            <CardHeader className="flex-shrink-0">
+            <CardHeader className="flex-shrink-0 pb-2 py-2">
               <div className="flex items-center justify-between">
-                <CardTitle>{mode === 'live' ? 'Live EEG Stream' : 'Playback'}</CardTitle>
+                <CardTitle className="text-sm">{mode === 'live' ? 'Live EEG Stream' : 'Playback'}</CardTitle>
                 {mode === 'live' && (
                   <div className="flex items-center gap-2">
                     <Label className="text-sm">Time Window:</Label>
-                    <Input 
-                      type="number" 
+                    <Input
+                      type="number"
                       value={timeWindow}
                       onChange={(e) => setTimeWindow(Number(e.target.value))}
-                      min={1} 
-                      max={30} 
-                      className="w-20" 
+                      min={1}
+                      max={30}
+                      className="w-20"
                     />
                     <span className="text-sm text-muted-foreground">sec</span>
                   </div>
@@ -212,8 +212,8 @@ export function ComprehensiveTab() {
               </div>
             </CardHeader>
             <CardContent className="flex-1 overflow-hidden p-0">
-              <div className="h-[600px] w-full overflow-auto">
-                <LiveEEGStreamPanel 
+              <div className="h-[500px] w-full overflow-auto">
+                <LiveEEGStreamPanel
                   timeWindow={timeWindow}
                   isLive={mode === 'live'}
                 />
@@ -254,8 +254,8 @@ export function ComprehensiveTab() {
           )}
         </TabsContent>
 
-        <TabsContent value="analysis" className="space-y-4">
-          <div className="grid gap-4 lg:grid-cols-2">
+        <TabsContent value="analysis" className="space-y-3">
+          <div className="grid gap-3 lg:grid-cols-2">
             {showFFT && <FrequencyDomainAnalyzer isLive={mode === 'live'} />}
             {showSpectrogram && <Spectrogram isLive={mode === 'live'} timeWindow={30} />}
           </div>
@@ -268,8 +268,8 @@ export function ComprehensiveTab() {
 
         <TabsContent value="ops">
           <Card>
-            <CardHeader>
-              <CardTitle>Ops Center</CardTitle>
+            <CardHeader className="pb-2 py-2">
+              <CardTitle className="text-sm">Ops Center</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="h-96 rounded border border-border bg-muted/20 p-4">
@@ -280,9 +280,9 @@ export function ComprehensiveTab() {
         </TabsContent>
       </Tabs>
 
-      <div className="flex flex-wrap items-center gap-3 rounded border border-border bg-card p-4">
-        <Button 
-          variant="outline" 
+      <div className="flex flex-wrap items-center gap-2 rounded border border-border bg-card px-3 py-2">
+        <Button
+          variant="outline"
           size="sm"
           onClick={handleModeSwitch}
         >
